@@ -1,0 +1,11 @@
+Why end = start + 5 or 10 secs is useful:
+Keeps the highlight visible long enough for the user to read.
+
+No need to ask the user to manually set end time (simplifies UX).
+
+Works well for short headings, bullets, or summary points.
+
+<!-- @highlight=60-70 -->
+If the user is at t=60, you can auto-set end = 60 + 5 (or 10).
+
+================================================================================
