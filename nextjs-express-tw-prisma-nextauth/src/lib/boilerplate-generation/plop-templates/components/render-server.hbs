@@ -1,0 +1,25 @@
+import { cn } from "@/lib/utils";
+import { get{{pascalCase name}}s, get{{pascalCase name}}ById } from "@/features/{{camelCase name}}/actions/{{camelCase name}}Actions";
+import { {{pascalCase name}}ListView } from "./{{kebabCase name}}-list-view";
+import { {{pascalCase name}}DetailCard } from "./{{kebabCase name}}-detail-card";
+
+{{#if renderAsList}}
+// Render List of {{pascalCase name}}s
+export async function {{camelCase name}}ListRenderer({ className }: { className?: string }) {
+  const {{camelCase name}}sResult = await get{{pascalCase name}}s();
+
+  return (
+    <{{pascalCase name}}ListView {{camelCase name}}sResult={ {{camelCase name}}sResult } className={cn("", className)} />
+  );
+}
+
+{{else}}
+// Render Single {{pascalCase name}}
+export async function {{camelCase name}}Renderer({ id, className }: { id: string; className?: string }) {
+  const {{camelCase name}}Result = await get{{pascalCase name}}ById(id);
+
+  return (
+    <{{pascalCase name}}DetailCard {{camelCase name}}Result={ {{camelCase name}}Result } className={cn("", className)} />
+  );
+}
+{{/if}}

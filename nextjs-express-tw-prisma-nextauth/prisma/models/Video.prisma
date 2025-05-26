@@ -1,0 +1,9 @@
+model Video {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 👉 Add your fields here
+  name      String
+  // Example: isActive Boolean @default(true)
+}

@@ -1,0 +1,282 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table accounts {
+  id String [pk]
+  userId String [not null]
+  type String [not null]
+  provider String [not null]
+  providerAccountId String [not null]
+  refresh_token String
+  access_token String
+  expires_at Int
+  token_type String
+  scope String
+  id_token String
+  session_state String
+  user users [not null]
+
+  indexes {
+    (provider, providerAccountId) [unique]
+  }
+}
+
+Table sessions {
+  id String [pk]
+  sessionToken String [unique, not null]
+  userId String [not null]
+  expires DateTime [not null]
+  user users [not null]
+}
+
+Table verification_tokens {
+  identifier String [not null]
+  token String [not null]
+  expires DateTime [not null]
+
+  indexes {
+    (identifier, token) [unique]
+  }
+}
+
+Table users {
+  id String [pk]
+  name String
+  email String [unique]
+  emailVerified DateTime
+  image String
+  accounts accounts [not null]
+  sessions sessions [not null]
+  isProfileSetupDone Boolean [not null, default: false]
+  role Role [not null, default: 'DEVELOPER']
+  assignedTasks Task [not null]
+  reportedTasks Task [not null]
+  workLogs WorkLog [not null]
+  Comment Comment [not null]
+}
+
+Table Project {
+  id String [pk]
+  name String [not null]
+  category String [not null]
+  description String
+  gitRepo String
+  documentationLink String
+  hostedLink String
+  erdLink String
+  milestones Milestone [not null]
+  features Feature [not null]
+  comments Comment [not null]
+  templateId String
+  template Template
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Milestone {
+  id String [pk]
+  name String [not null]
+  description String
+  startDate DateTime
+  endDate DateTime
+  status MilestoneStatus [not null, default: 'OPEN']
+  project Project [not null]
+  projectId String [not null]
+  features Feature [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Feature {
+  id String [pk]
+  title String [not null]
+  what String [not null]
+  why String [not null]
+  how String [not null]
+  status FeatureStatus [not null, default: 'PROPOSED']
+  milestone Milestone [not null]
+  milestoneId String [not null]
+  project Project [not null]
+  projectId String [not null]
+  tasks Task [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Task {
+  id String [pk]
+  title String [not null]
+  description String
+  tags String[] [not null]
+  what String [not null]
+  why String [not null]
+  how String [not null]
+  status SubtaskStatus [not null, default: 'OPEN']
+  expectedOutcome String
+  actualOutcome OutcomeStatus
+  pivotReason String
+  challenges String
+  decisionCriteria String
+  buildVsBuy String
+  shippingImperfect Boolean [not null, default: false]
+  improvementPlan String
+  resourcesUsed String[] [not null]
+  userFlowDiagram String
+  reusableAssetNote String
+  atomicTasks Json [not null]
+  startDate DateTime
+  endDate DateTime
+  featureId String [not null]
+  feature Feature [not null]
+  assigneeId String
+  assignee users
+  reporterId String
+  reporter users
+  timeboxes Timebox [not null]
+  workLogs WorkLog [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table WorkLog {
+  id String [pk]
+  taskId String [not null]
+  task Task [not null]
+  userId String [not null]
+  user users [not null]
+  startTime DateTime [not null]
+  endTime DateTime [not null]
+  duration Int [not null]
+  comment String
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table Comment {
+  id String [pk]
+  message String [not null]
+  authorId String [not null]
+  author users [not null]
+  projectId String [not null]
+  project Project [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table Template {
+  id String [pk]
+  type String [not null]
+  description String
+  tags String[] [not null]
+  resources Resource [not null]
+  guide String
+  sampleProjects Project [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Resource {
+  id String [pk]
+  name String [not null]
+  type ResourceType [not null]
+  url String [not null]
+  description String
+  templateId String [not null]
+  template Template [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table Calendar {
+  id String [pk]
+  name String [not null]
+  timeboxes Timebox [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Timebox {
+  id String [pk]
+  title String
+  start DateTime [not null]
+  end DateTime [not null]
+  calendarId String [not null]
+  calendar Calendar [not null]
+  taskId String [not null]
+  task Task [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Enum Role {
+  DEVELOPER
+  MANAGER
+  CLIENT
+}
+
+Enum MilestoneStatus {
+  OPEN
+  COMPLETED
+  CANCELLED
+}
+
+Enum FeatureStatus {
+  PROPOSED
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+}
+
+Enum SubtaskStatus {
+  OPEN
+  APPROVED
+  IN_DEVELOPMENT
+  PARKED
+  TESTING
+  READY_FOR_BUILD
+  DONE
+}
+
+Enum OutcomeStatus {
+  OK
+  EXCEEDS
+  FAILED
+}
+
+Enum ResourceType {
+  GIT_REPO
+  DOC
+  VIDEO
+  TOOL
+  ARTICLE
+}
+
+Ref: accounts.userId > users.id [delete: Cascade]
+
+Ref: sessions.userId > users.id [delete: Cascade]
+
+Ref: Project.templateId > Template.id
+
+Ref: Milestone.projectId > Project.id
+
+Ref: Feature.milestoneId > Milestone.id
+
+Ref: Feature.projectId > Project.id
+
+Ref: Task.featureId > Feature.id
+
+Ref: Task.assigneeId > users.id
+
+Ref: Task.reporterId > users.id
+
+Ref: WorkLog.taskId > Task.id
+
+Ref: WorkLog.userId > users.id
+
+Ref: Comment.authorId > users.id
+
+Ref: Comment.projectId > Project.id
+
+Ref: Resource.templateId > Template.id
+
+Ref: Timebox.calendarId > Calendar.id
+
+Ref: Timebox.taskId > Task.id

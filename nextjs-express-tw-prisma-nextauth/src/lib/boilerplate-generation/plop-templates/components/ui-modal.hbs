@@ -1,0 +1,9 @@
+import { Modal } from "@/components/ui/modal";
+
+export function {{pascalCase name}}Modal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="{{pascalCase name}} Modal">
+      <p>Modal content for {{pascalCase name}}</p>
+    </Modal>
+  );
+}
