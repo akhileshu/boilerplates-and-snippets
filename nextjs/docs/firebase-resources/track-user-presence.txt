@@ -1,0 +1,30 @@
+/*
+use this when using firebase auth 
+*/
+import { onAuthStateChanged } from "firebase/auth";
+import { ref, onDisconnect, set, serverTimestamp } from "firebase/database";
+import { auth, rtdb } from "./firebase"; // your firebase config
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) return;
+
+  const userStatusRef = ref(rtdb, `/status/${user.uid}`);
+
+  const isOffline = {
+    state: "OFFLINE",
+    lastChanged: serverTimestamp(),
+  };
+
+  const isOnline = {
+    state: "ONLINE",
+    lastChanged: serverTimestamp(),
+  };
+
+  // Set up onDisconnect to mark as offline
+  onDisconnect(userStatusRef)
+    .set(isOffline)
+    .then(() => {
+      // Set online status now
+      set(userStatusRef, isOnline);
+    });
+});

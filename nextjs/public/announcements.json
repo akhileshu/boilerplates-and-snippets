@@ -1,0 +1,16 @@
+[
+  {
+    "tag": "terms-update-v2",
+    "text": "📄 Our Terms & Conditions have been updated.",
+    "type": "info",
+    "showOn": "2025-07-25T00:00:00Z",
+    "expiresOn": "2025-08-25T00:00:00Z",
+    "link": "/terms"
+  },
+  {
+    "tag": "new-feature-xp",
+    "text": "🎯 New XP rewards launched for co-hosts!",
+    "type": "success",
+    "link": "/rewards"
+  }
+]

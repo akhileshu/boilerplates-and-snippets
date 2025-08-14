@@ -1,0 +1,4 @@
+will allow to delete group , rooms with onDelete: Cascade 
+means records dependent on group or room get deleted
+
+// as of initial mvp this setup is quick and easy , in later versions will decide on granualar level data preservation 

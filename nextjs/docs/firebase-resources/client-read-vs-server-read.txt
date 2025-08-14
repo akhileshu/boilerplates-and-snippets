@@ -1,0 +1,15 @@
+addPresenceToUsers 
+vs 
+useUserPresence
+
+✅ Prefer useUserPresence in client components — here's why:
+1. It uses hooks (useState, useEffect, etc.)
+Hooks can only run in client components.
+
+Server components don’t support React hooks or browser APIs (like onValue, document, etc.).
+
+2. It's realtime
+The hook listens for live updates from Firebase.
+
+Server components are static unless re-rendered; they can't handle realtime data.
+

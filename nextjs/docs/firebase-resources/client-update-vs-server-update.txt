@@ -1,0 +1,9 @@
+usage in our app
+client - setupUserPresence
+server - actions/updatePresence
+
+as we are using next auth 
+we are unable to setup write rules restrictions in fb Realtime db
+
+alternately 
+we can use firebase admin sdk - to update presence from server

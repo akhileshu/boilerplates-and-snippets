@@ -1,0 +1,12 @@
+Firestore Presence Approach
+
+What It Doesn’t Do (Limitations):
+Doesn’t detect network disconnect instantly (e.g., sudden power off)
+
+Relies on beforeunload or periodic pings
+
+```
+// Show user as online only if last_changed is within 1–2 minutes
+state == "online" && last_changed > now - 2min
+
+```

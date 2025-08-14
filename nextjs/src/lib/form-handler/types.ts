@@ -1,0 +1,1 @@
+export type RevalidatePath = "current" | (string & {});

@@ -1,0 +1,13 @@
+
+////////////////Difference: Sequential vs Parallel Execution
+
+const raisedByMe = await prisma.findMany(...); // ⏳ Waits for DB response
+
+const approvableByMe = await prisma.findMany(...); // ⏳ Starts only after above is done
+
+------------
+
+const [raisedByMe, approvableByMe] = await Promise.all([
+  prisma.findMany(...),
+  prisma.findMany(...),
+]);

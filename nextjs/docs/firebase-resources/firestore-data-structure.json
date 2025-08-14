@@ -1,0 +1,12 @@
+{
+  "status": {
+    "userId1": {
+      "state": "online",
+      "last_changed": "2025-07-22T08:50:00Z"
+    },
+    "userId2": {
+      "state": "offline",
+      "last_changed": "2025-07-22T08:40:00Z"
+    }
+  }
+}

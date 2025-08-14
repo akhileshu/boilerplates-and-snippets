@@ -1,0 +1,1 @@
+## using return type of select  , include prisma query structures to derive its return type so we can type our server actions functions (or api's)

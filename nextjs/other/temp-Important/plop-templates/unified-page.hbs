@@ -1,0 +1,71 @@
+{{!-- app/{{route}}/page.tsx --}}
+
+import React from "react";
+import { withFetchStatus } from "@/lib/rendering/withFetchStatus";
+
+{{#if needsAuth}}
+import { requireAuth } from "@/server/auth/requireAuth";
+{{/if}}
+
+import { {{serviceName}} } from "@/services/{{resourcePlural}}";
+
+{{#if (eq pageType "createNewForm")}}
+export default async function Page() {
+  return <{{renderFnFull}} />;
+}
+{{else if (eq pageType "renderList")}}
+import { SearchParams } from "@/lib/rendering";
+
+export default async function Page({ searchParams }: { searchParams: SearchParams }) {
+  return withFetchStatus({
+    {{#if filterConfigFull}}
+    searchParams,
+    filterConfig: {{filterConfigFull}},
+    {{/if}}
+    fetchFn: (filters) => {{fetchFnFull}}(filters!),
+    renderFn: (items) => <{{renderFnFull}} {{resourcePlural}}={items} />,
+    cardTitle: "{{cardTitle}}",
+  });
+}
+{{else if (eq pageType "renderItem")}}
+type Params = Promise<{ {{ResourceName}}Id: string }>;
+
+export default async function Page({ params }: { params: Params }) {
+  const { {{ResourceName}}Id } = await params;
+
+  return withFetchStatus({
+    fetchFn: () => {{fetchFnFull}}({{ResourceName}}Id),
+    renderFn: (item) => <{{renderFnFull}} {{ResourceName}}={item} />,
+    cardTitle: "{{cardTitle}}",
+  });
+}
+{{else if (eq pageType "editForm")}}
+type Params = Promise<{ {{ResourceName}}Id: string }>;
+
+export default async function Page({ params }: { params: Params }) {
+  const { {{ResourceName}}Id } = await params;
+
+  return withFetchStatus({
+    fetchFn: () => {{fetchFnFull}}({{ResourceName}}Id),
+    {{#if needsAuth}}
+    beforeRender: async (item) => {
+      return await requireAuth({
+        authorize: (session) => {{authCheckCondition}},
+        onFailure: {
+          type: "unauthorized",
+          data: { item },
+          action: "edit {{ResourceName}} details",
+        },
+      });
+    },
+    {{/if}}
+    renderFn: (item) => (
+      <div>
+        <{{renderFnFull}} {{ResourceName}}={item} />
+        {{!-- Add your delete button here if needed --}}
+      </div>
+    ),
+    cardTitle: "{{cardTitle}}",
+  });
+}
+{{/if}}

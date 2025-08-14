@@ -1,0 +1,88 @@
+{
+  "files.exclude": {
+    "**/node_modules/**": true,
+    "**/.git/**": true,
+    // "**/.next/**": true,
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/package-lock.json": true,
+    // "**/.next": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/vendor": true,
+    // "**/build": true,
+    "**/dist": true,
+    "**/.output": true,
+    "**/.nuxt": true,
+    // "**/.vscode": true,
+    "**/*.zip": true
+    // "**/public/**": true,
+    // "**/cypress/**": true
+    // "src/lib/__internal__/**": true,
+
+    // "**/other/**": true
+    // "**/__internal__/**": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.git/**": true,
+    // "**/.next/**": true,
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/package-lock.json": true,
+    // "**/.next": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/vendor": true,
+    // "**/build": true,
+    "**/dist": true,
+    "**/.output": true,
+    "**/.nuxt": true,
+    // "**/.vscode": true,
+    "**/*.zip": true
+    // "**/public/**": true,
+    // "**/cypress/**": true
+    // "src/lib/__internal__/**": true,
+
+    // "**/other/**": true
+
+    // "**/__internal__/**": true
+  },
+  "search.exclude": {
+    "**/node_modules/**": true,
+    "**/.git/**": true,
+    // "**/.next/**": true,
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/package-lock.json": true,
+    // "**/.next": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/vendor": true,
+    // "**/build": true,
+    "**/dist": true,
+    "**/.output": true,
+    "**/.nuxt": true,
+    // "**/.vscode": true,
+    "**/*.zip": true
+    // "**/public/**": true,
+    // "**/cypress/**": true
+    // "src/lib/__internal__/**": true,
+
+    // "**/other/**": true
+
+    // // "**/__internal__/**": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always"
+  }
+}

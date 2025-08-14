@@ -1,0 +1,28 @@
+📍 To enable Realtime Database:
+Go to Firebase Console
+
+Select your project
+
+Go to Build > Realtime Database
+
+Click "Create Database"
+
+Choose a region (same as Firestore ideally)
+
+Select Start in test mode (for dev)
+
+-----
+
+
+
+cli 
+
+npm install -g firebase-tools
+firebase --version
+firebase login
+
+firebase use --add - pick's firebase project and create's  .firebaserc
+add functions/ to project root - skipping as cloud functions are paid only , insted will do (Client-only Realtime Presence (no Firestore sync)) 
+
+
+

@@ -1,0 +1,56 @@
+model UserPreference {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  persona      PersonaType
+  userFocus    UserFocus?
+  availability Availability?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  availabilityId String?
+
+  @@map("UserPreferences")
+}
+
+enum PersonaType {
+  LEARNER
+  MENTOR
+  COLLABORATOR
+  PRODUCT_IMPROVER
+  SHOWCASER
+  NETWORKER
+}
+
+model UserFocus {
+  id        String     @id @default(cuid())
+  focusId   String
+
+
+  // Relation to UserPreference (optional)
+  userPreferences   UserPreference @relation(fields: [userPreferencesId], references: [id])
+  userPreferencesId String         @unique // Removed `@unique` to allow multiple focuses per pref
+
+  @@map("area_of_focus")
+}
+
+model Availability {
+  id               String         @id @default(cuid())
+  UserPreference   UserPreference @relation(fields: [UserPreferenceId], references: [id])
+  UserPreferenceId String         @unique
+  preferredDays    Weekday[]
+  startTime        String // "18:00"
+  endTime          String // "21:00"
+  prefersWeekends  Boolean // todo : dont need this , as its already covered in preferredDays
+}
+
+enum Weekday {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}

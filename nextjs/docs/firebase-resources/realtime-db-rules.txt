@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "status": {
+      "$userId": {
+        // 👇 Allow read to anyone (or restrict if needed)
+        ".read": true,
+
+        // 👇 Only allow the user to write to their own status , this will not work as we are using next auth insted of firebase auth
+        // ".write": "auth != null && auth.uid === $userId",
+          ".write": true,
+
+        // 👇 Optional: Validate structure
+        ".validate": "newData.hasChildren(['state', 'lastChanged'])",
+
+        "state": {
+          ".validate": "newData.isString() && (newData.val() === 'ONLINE' || newData.val() === 'AWAY' || newData.val() === 'OFFLINE')"
+        },
+        "lastChanged": {
+          ".validate": "newData.isNumber()"
+        }
+      }
+    }
+  }
+}
