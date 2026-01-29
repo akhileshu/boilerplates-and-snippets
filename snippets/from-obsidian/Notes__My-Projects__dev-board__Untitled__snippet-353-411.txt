@@ -1,0 +1,14 @@
+
+---
+
+### 👤 UserPersona
+
+```prisma
+model UserPersona {
+  id         String   @id @default(uuid())
+  name       String
+  goals      String[]
+  painPoints String[]
+  tasks      Task[]
+  createdAt  DateTime @default(now())
+}

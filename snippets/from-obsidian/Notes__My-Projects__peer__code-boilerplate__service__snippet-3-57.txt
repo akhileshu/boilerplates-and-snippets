@@ -1,0 +1,52 @@
+find . -print | sed -e 's;[^/]*/;|___;g;s;___|; |;g'
+.
+|___components
+| |___internal
+| |___forms
+| | |___create-room.tsx
+| | |___RespondToRoomJoinRequest.tsx
+| | |___form-elements
+| | | |___RecurringScheduleInput.tsx
+| | | |___ScheduleInputSection.tsx
+| | | |___JoinRoomButton.tsx
+| | |___edit-room.tsx
+| | |___RequestToJoinPrivateRoomDialogButton.tsx
+| | |___sync-attendees-button.tsx
+| | |___JoinPublicRoomButton.tsx
+| | |___index.ts
+| |___renderers
+| | |___RoomJoinRequests.tsx
+| | |___RoomAccessSection.tsx
+| | |___joined-rooms.tsx
+| | |___index.ts
+|___actions
+| |___joinRoom.ts
+| |___leaveRoom.ts
+| |___delete-room.ts
+| |___syncRoomMeetingGoogleAttendees.ts
+| |___createRoom.ts
+| |___toggleRemindMe.ts
+| |___handleJoinRequest.ts
+| |___edit-room.ts
+| |___becomeHost.ts
+| |___index.ts
+|___types
+| |___get-room-by-id.ts
+| |___room-requests.ts
+| |___rooms.ts
+| |___index.ts
+|___utils
+| |___calculate-room-status.ts
+| |___room-enums-options.ts
+| |___schedulers
+| | |___updateRoomStatuses.ts
+| | |___triggerReminders.ts
+| |___room-join-request-filter-config.ts
+| |___room-filter-config.ts
+| |___index.ts
+|___queries
+| |___getRoomById.ts
+| |___getJoinedRooms.ts
+| |___get-room-join-requests.ts
+| |___index.ts
+|___index.ts

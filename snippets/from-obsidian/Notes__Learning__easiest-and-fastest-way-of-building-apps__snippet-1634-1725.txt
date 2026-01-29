@@ -1,0 +1,14 @@
+
+
+## **4. tRPC Initialization (`src/server/trpc.ts`)**
+
+```ts
+import { initTRPC } from "@trpc/server";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+const t = initTRPC.create();
+
+export const createRouter = t.router;
+export const prismaClient = prisma;
+export const prisma = prismaClient;

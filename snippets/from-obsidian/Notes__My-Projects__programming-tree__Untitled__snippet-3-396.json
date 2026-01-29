@@ -1,0 +1,392 @@
+{
+  "tool": {
+    "name": "ArchFlow",
+    "version": "1.0.0",
+    "purpose": "Visual Architecture Design and Code Generation Platform",
+    "license": "MIT",
+    "repository": "https://github.com/username/archflow"
+  },
+  
+  "coreConcepts": {
+    "nodeTypes": [
+      {
+        "id": "node_model",
+        "name": "Model",
+        "description": "Database entity/table",
+        "icon": "database",
+        "editable": false,
+        "source": "prisma",
+        "properties": ["name", "fields", "relations", "policies"]
+      },
+      {
+        "id": "node_usecase",
+        "name": "UseCase",
+        "description": "Business use case with input/output",
+        "icon": "workflow",
+        "editable": true,
+        "properties": ["name", "reads", "writes", "validation", "policies"]
+      },
+      {
+        "id": "node_flow",
+        "name": "Flow",
+        "description": "User story or business process",
+        "icon": "flow",
+        "editable": true,
+        "properties": ["name", "usecases", "progress", "status"]
+      },
+      {
+        "id": "node_api",
+        "name": "API",
+        "description": "HTTP/GraphQL endpoint",
+        "icon": "api",
+        "editable": true,
+        "properties": ["name", "method", "path", "usecase", "policies"]
+      },
+      {
+        "id": "node_service",
+        "name": "Service",
+        "description": "Business logic service",
+        "icon": "service",
+        "editable": true,
+        "properties": ["name", "methods", "dependencies"]
+      },
+      {
+        "id": "node_repository",
+        "name": "Repository",
+        "description": "Data access layer",
+        "icon": "storage",
+        "editable": true,
+        "properties": ["name", "queries", "mutations", "model"]
+      },
+      {
+        "id": "node_policy",
+        "name": "Policy",
+        "description": "Architectural decision/rule",
+        "icon": "policy",
+        "editable": true,
+        "properties": ["name", "type", "targets", "config"]
+      }
+    ],
+    
+    "edgeTypes": [
+      {
+        "id": "edge_reads",
+        "name": "reads",
+        "description": "Node reads data from model",
+        "color": "#3b82f6",
+        "sourceTypes": ["node_usecase", "node_service"],
+        "targetTypes": ["node_model"]
+      },
+      {
+        "id": "edge_writes",
+        "name": "writes",
+        "description": "Node writes data to model",
+        "color": "#ef4444",
+        "sourceTypes": ["node_usecase", "node_service"],
+        "targetTypes": ["node_model"]
+      },
+      {
+        "id": "edge_depends",
+        "name": "depends",
+        "description": "Node depends on another node",
+        "color": "#8b5cf6",
+        "sourceTypes": ["*"],
+        "targetTypes": ["*"]
+      },
+      {
+        "id": "edge_triggers",
+        "name": "triggers",
+        "description": "Node triggers execution of another node",
+        "color": "#10b981",
+        "sourceTypes": ["node_usecase", "node_api"],
+        "targetTypes": ["node_usecase", "node_service"]
+      }
+    ],
+    
+    "policyTypes": [
+      {
+        "id": "policy_crud",
+        "name": "CRUD Policy",
+        "description": "Auto-generate CRUD operations for models",
+        "configSchema": {
+          "operations": ["create", "read", "update", "delete"],
+          "exposure": ["public", "authenticated", "admin"],
+          "validation": "boolean"
+        }
+      },
+      {
+        "id": "policy_security",
+        "name": "Security Policy",
+        "description": "Access control and permissions",
+        "configSchema": {
+          "roles": ["admin", "user", "guest"],
+          "ownership": "boolean",
+          "rateLimit": ["none", "low", "medium", "high"]
+        }
+      },
+      {
+        "id": "policy_validation",
+        "name": "Validation Policy",
+        "description": "Input validation rules",
+        "configSchema": {
+          "required": "boolean",
+          "type": ["string", "number", "email", "date"],
+          "rules": "array"
+        }
+      },
+      {
+        "id": "policy_transaction",
+        "name": "Transaction Policy",
+        "description": "Database transaction boundaries",
+        "configSchema": {
+          "enabled": "boolean",
+          "isolationLevel": ["read_committed", "repeatable_read", "serializable"]
+        }
+      }
+    ]
+  },
+  
+  "ui": {
+    "layout": {
+      "leftPanel": {
+        "sections": ["nodeLibrary", "models", "templates", "search"],
+        "width": 280,
+        "collapsible": true
+      },
+      "canvas": {
+        "grid": true,
+        "snapToGrid": true,
+        "backgroundPattern": "dots",
+        "zoomRange": [0.1, 2]
+      },
+      "rightPanel": {
+        "sections": ["nodeProperties", "policyConfig", "validation", "generation"],
+        "width": 320,
+        "collapsible": true
+      },
+      "bottomPanel": {
+        "sections": ["errors", "logs", "progress"],
+        "height": 200,
+        "collapsible": true
+      }
+    },
+    
+    "keyboardShortcuts": {
+      "createNode": "Space",
+      "selectAll": "Cmd/Ctrl + A",
+      "deleteSelection": "Delete",
+      "groupSelection": "Cmd/Ctrl + G",
+      "zoomIn": "Cmd/Ctrl + Plus",
+      "zoomOut": "Cmd/Ctrl + Minus",
+      "commandPalette": "Cmd/Ctrl + K",
+      "save": "Cmd/Ctrl + S",
+      "export": "Cmd/Ctrl + E"
+    },
+    
+    "theme": {
+      "primaryColor": "#6366f1",
+      "backgroundColor": "#f8fafc",
+      "nodeColor": "#ffffff",
+      "edgeColor": "#cbd5e1",
+      "fontFamily": "Inter, system-ui, sans-serif"
+    }
+  },
+  
+  "generation": {
+    "outputFormats": [
+      {
+        "id": "format_architecture_json",
+        "name": "Architecture JSON",
+        "description": "Complete architecture specification",
+        "fileExtension": ".arch.json",
+        "schema": "architecture-schema.json"
+      },
+      {
+        "id": "format_prisma_schema",
+        "name": "Prisma Schema",
+        "description": "Database schema for Prisma",
+        "fileExtension": ".prisma",
+        "template": "prisma-template.prisma"
+      },
+      {
+        "id": "format_plop_config",
+        "name": "Plop Configuration",
+        "description": "Code generation configuration",
+        "fileExtension": ".plop.js",
+        "template": "plop-template.js"
+      }
+    ],
+    
+    "templates": [
+      {
+        "id": "template_rest_api",
+        "name": "REST API",
+        "description": "Generate REST API boilerplate",
+        "includes": ["models", "controllers", "services", "repositories", "dtos"]
+      },
+      {
+        "id": "template_graphql_api",
+        "name": "GraphQL API",
+        "description": "Generate GraphQL API boilerplate",
+        "includes": ["models", "resolvers", "services", "typeDefs", "inputs"]
+      },
+      {
+        "id": "template_fullstack",
+        "name": "Fullstack Application",
+        "description": "Complete fullstack application",
+        "includes": ["api", "frontend", "database", "auth", "deployment"]
+      }
+    ]
+  },
+  
+  "validation": {
+    "rules": [
+      {
+        "id": "rule_no_orphan_usecases",
+        "name": "No Orphan UseCases",
+        "description": "Every UseCase must be part of at least one Flow",
+        "severity": "error",
+        "check": "usecase.flows.length > 0"
+      },
+      {
+        "id": "rule_api_has_usecase",
+        "name": "API Has UseCase",
+        "description": "Every API must map to exactly one UseCase",
+        "severity": "error",
+        "check": "api.usecase !== null"
+      },
+      {
+        "id": "rule_read_write_separation",
+        "name": "Read/Write Separation",
+        "description": "Repository methods must be either query or mutation, not both",
+        "severity": "warning",
+        "check": "repo.method.type !== 'both'"
+      },
+      {
+        "id": "rule_no_direct_db_access",
+        "name": "No Direct DB Access",
+        "description": "API cannot access database directly",
+        "severity": "error",
+        "check": "api.directDbAccess === false"
+      }
+    ],
+    
+    "autoFix": [
+      {
+        "id": "fix_add_missing_validation",
+        "name": "Add Missing Validation",
+        "description": "Auto-add validation for required fields",
+        "appliesTo": ["usecase"]
+      },
+      {
+        "id": "fix_generate_crud",
+        "name": "Generate CRUD",
+        "description": "Auto-generate CRUD operations for models",
+        "appliesTo": ["model"]
+      }
+    ]
+  },
+  
+  "integrations": [
+    {
+      "name": "Prisma",
+      "type": "database",
+      "supportedVersions": ["4.x", "5.x"],
+      "import": true,
+      "export": true
+    },
+    {
+      "name": "Plop",
+      "type": "code-generation",
+      "supportedVersions": ["3.x"],
+      "export": true
+    },
+    {
+      "name": "React Flow",
+      "type": "canvas",
+      "version": "11.x",
+      "purpose": "Visual node editor"
+    },
+    {
+      "name": "TypeScript",
+      "type": "language",
+      "version": "5.x",
+      "purpose": "Type definitions and validation"
+    }
+  ],
+  
+  "projectStructure": {
+    "source": {
+      "path": "src",
+      "folders": [
+        "components",
+        "hooks",
+        "lib",
+        "types",
+        "utils",
+        "generators"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "folders": ["assets", "icons", "templates"]
+    },
+    "config": {
+      "files": [
+        "package.json",
+        "tsconfig.json",
+        "tailwind.config.js",
+        "vite.config.ts"
+      ]
+    }
+  },
+  
+  "development": {
+    "techStack": [
+      "React 18",
+      "TypeScript 5",
+      "Vite",
+      "Tailwind CSS",
+      "React Flow 11",
+      "Zod",
+      "Prisma",
+      "Plop"
+    ],
+    
+    "dependencies": {
+      "core": [
+        "react",
+        "react-dom",
+        "react-flow-renderer",
+        "zustand",
+        "immer",
+        "lodash"
+      ],
+      "ui": [
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-dropdown-menu",
+        "@radix-ui/react-tooltip",
+        "lucide-react",
+        "class-variance-authority"
+      ],
+      "data": [
+        "zod",
+        "@prisma/client",
+        "prisma"
+      ],
+      "codegen": [
+        "plop",
+        "handlebars",
+        "prettier"
+      ]
+    },
+    
+    "scripts": {
+      "dev": "vite",
+      "build": "tsc && vite build",
+      "preview": "vite preview",
+      "generate": "node scripts/generate.js",
+      "export": "node scripts/export.js"
+    }
+  }
+}

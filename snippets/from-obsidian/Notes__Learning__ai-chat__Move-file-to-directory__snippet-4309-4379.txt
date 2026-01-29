@@ -1,0 +1,71 @@
+
+| Spec | Your i3-1215U | Ryzen 5 5600X |
+| --- | --- | --- |
+| Cores / Threads | 6c / 8t | 6c / 12t |
+| Sustained power | ~15–28W | ~65W |
+| Cache | small | **32MB L3** 🔥 |
+| AVX2 throughput | low | **much higher** |
+| Thermal throttling | yes | no |
+
+👉 **LLMs LOVE cache + sustained power**.
+
+* * *
+
+## ⚡ Real performance difference (what you’d feel)
+
+For **Mistral-7B Q4 (CPU)**:
+
+| Metric | Laptop | 5600X |
+| --- | --- | --- |
+| First token | 15–30s | **4–7s** |
+| Tokens/sec | 2–4 | **8–12** |
+| Usability | ❌ painful | ✅ usable |
+| Editing files | ❌ no | ✅ yes |
+| Streaming | ❌ flaky | ✅ smooth |
+
+That’s **3–4× faster**, _consistently_.
+
+* * *
+
+## 🧠 Why desktop feels “usable” and laptop doesn’t
+
+Local LLM UX depends on **time-to-first-token**.
+
+Human tolerance:
+
+* <3s → feels instant
+    
+* 3–8s → acceptable
+    
+* 10–30s → feels broken
+    
+* > 30s → abandon
+    
+
+Your laptop sits in the **abandon zone**.  
+A 5600X lives in the **acceptable zone**.
+
+* * *
+
+## 💰 What ₹50k realistically buys (India)
+
+Typical build:
+
+* Ryzen 5 5600 / 5600X
+    
+* 32 GB RAM
+    
+* NVMe SSD
+    
+* no GPU
+    
+
+This is **perfect for CPU LLMs**.
+
+* * *
+
+## 🧪 What becomes POSSIBLE on that machine
+
+With the same software you built:
+
+* `ai ask` → responsive

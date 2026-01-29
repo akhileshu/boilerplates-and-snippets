@@ -1,0 +1,34 @@
+      },
+      "unreadCount": { ".validate": "newData.isNumber()" },
+      "role": {
+        ".validate": "newData.isString() && (newData.val() === 'buyer' || newData.val() === 'seller')"
+      }
+    }
+  }
+},
+
+"chatPrivacy": {
+  "$chatId": {
+    ".read": true,
+    ".write": true,
+
+    "$uid": {
+      "shared": { ".validate": "newData.hasChildren(['phone','location'])" },
+      "requests": {
+        "$kind": {
+          ".validate": "newData.isBoolean()"
+        }
+      }
+    }
+  }
+},
+
+"typing": {
+  "$chatId": {
+    ".read": true,
+    ".write": true,
+
+    "$uid": { ".validate": "newData.isBoolean()" }
+  }
+},
+  "userNotifications": {

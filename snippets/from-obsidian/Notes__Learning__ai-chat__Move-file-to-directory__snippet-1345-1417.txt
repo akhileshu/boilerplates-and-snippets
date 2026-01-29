@@ -1,0 +1,5 @@
+
+Make executable (once):
+
+```bash
+chmod +x ~/bin/ai

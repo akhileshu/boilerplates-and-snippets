@@ -1,0 +1,148 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Or "mysql" for Planetscale
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String        @id @default(cuid())
+  name            String?
+  email           String        @unique
+  phone           String?       @unique // Mandatory verification
+  password        String?       // Hashed password if not using pure OAuth
+  profilePicture  String?       // URL to Cloudflare R2
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  rating          Float         @default(0) // Average rating from transactions
+  reviewCount     Int           @default(0)
+  // Trust signals
+  vouchedBy       String[]      // User IDs who vouched for this user
+  // Relationships
+  ownedBooks      Book[]        @relation("OwnedBooks")
+  initiatedTransactions Transaction[] @relation("InitiatedTransactions") // e.g., borrower, buyer, swapper
+  receivedTransactions Transaction[] @relation("ReceivedTransactions") // e.g., owner, seller, co-owner
+  coOwnedBooks    Book[]        @relation("CoOwners")
+}
+
+model Book {
+  id              String        @id @default(cuid())
+  ownerId         String
+  owner           User          @relation("OwnedBooks", fields: [ownerId], references: [id])
+  coOwnerIds      String[]      // IDs of co-owners, for CO_OWN mode
+  coOwners        User[]        @relation("CoOwners")
+  title           String
+  author          String?
+  isbn            String?
+  conditionText   String        // Detailed text description by owner
+  conditionPhotos String[]      // URLs to Cloudflare R2 (mandatory for listing, e.g., 3 photos)
+  currentMode     BookMode      @default(AVAILABLE_FOR_BORROW) // Enum to indicate primary mode: AVAILABLE_FOR_BORROW, FOR_SALE, FOR_CO_OWN, FOR_SWAP
+  priceCents      Int?          // For FOR_SALE mode
+  suggestedDepositCents Int?      // For BORROW/CO_OWN/SWAP modes
+  available       Boolean       @default(true) // Overall availability status
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  // Relationships
+  transactions    Transaction[]
+}
+
+enum BookMode {
+  AVAILABLE_FOR_BORROW
+  FOR_SALE
+  FOR_CO_OWN
+  FOR_SWAP
+  // Add other states like UNAVAILABLE, RESERVED, etc.
+}
+
+enum TransactionType {
+  BORROW // Temporary access with deposit + fee
+  SELL   // Permanent transfer, one-time payment
+  CO_OWN // Shared permanent ownership, scheduled access
+  ROTATE_SWAP // Temporary exchange for freshness
+}
+
+enum TransactionStatus {
+  REQUESTED       // Initial state
+  ACCEPTED        // Owner accepted request
+  PAID            // Payment/deposit processed
+  PICKUP_SCHEDULED
+  PICKED_UP       // Borrower/buyer picked up
+  RETURNED        // Book returned to owner
+  DELIVERED       // For buy/sell with delivery
+  CONDITION_CONFIRMED // Owner confirmed book condition on return/delivery
+  DEPOSIT_RELEASED // Deposit refunded/captured
+  COMPLETED       // Transaction successfully finished
+  CANCELLED       // Transaction cancelled
+  DISPUTED        // Dispute raised
+  REFUNDED        // Payment/deposit refunded
+}
+
+model Transaction {
+  id              String            @id @default(cuid())
+  bookId          String
+  book            Book              @relation(fields: [bookId], references: [id])
+  initiatorId     String            // e.g., borrower, buyer, swapper (User who initiated the transaction)
+  initiator       User              @relation("InitiatedTransactions", fields: [initiatorId], references: [id])
+  targetUserId    String            // e.g., owner, seller, co-owner (User whose book is involved)
+  targetUser      User              @relation("ReceivedTransactions", fields: [targetUserId], references: [id])
+  type            TransactionType
+  status          TransactionStatus @default(REQUESTED)
+
+  // Financials - conditional based on type
+  amountCents     Int?              // Price for BUY/SELL, or total value for CO_OWN/SWAP if applicable
+  depositCents    Int?              // Refundable deposit for BORROW/CO_OWN/SWAP
+  feeCents        Int?              // Platform service fee for BORROW/SELL/SWAP
+  ownerShareCents Int?              // Amount owner receives from fee/sale
+  platformCutCents Int?             // Amount platform keeps from fee/sale
+  currency        String            @default("INR")
+  paymentIntentId String?           // Reference to Stripe/Razorpay PaymentIntent or Order ID
+
+  // Timestamps
+  requestedAt     DateTime          @default(now())
+  acceptedAt      DateTime?
+  pickupScheduledAt DateTime?
+  pickedUpAt      DateTime?         // Borrower/Buyer confirms pickup
+  returnedAt      DateTime?         // Borrower confirms return or Book returned to owner
+  deliveredAt     DateTime?         // For items requiring delivery confirmation
+  completedAt     DateTime?
+  disputedAt      DateTime?
+
+  // Condition tracking
+  initiatorPhotosOnPickup String[]?   // Borrower/Buyer photos at pickup
+  targetPhotosOnReturn  String[]?   // Owner/Seller photos on return/delivery
+
+  // Co-ownership specific fields
+  accessSchedule  String?           // JSON string for co-ownership access rules/schedule
+
+  // Rotate/Swap specific fields
+  swapPartnerBookId String?         // For direct swaps
+  swapPartnerBook   Book?           @relation("SwapPartnerBook", fields: [swapPartnerBookId], references: [id])
+  returnRequired    Boolean?          // For temporary rotations
+
+  // Admin/Dispute
+  disputeReason   String?
+  adminNotes      String?
+  // Relationships
+  @@map("transactions") // Map to a custom table name
+}
+
+// Separate table for reviews if more complex review system is needed
+model Review {
+  id              String        @id @default(cuid())
+  transactionId   String        @unique // Each transaction can have one review
+  transaction     Transaction   @relation(fields: [transactionId], references: [id])
+  reviewerId      String
+  reviewer        User          @relation("Reviewer", fields: [reviewerId], references: [id])
+  revieweeId      String        // User being reviewed
+  reviewee        User          @relation("Reviewee", fields: [revieweeId], references: [id])
+  rating          Float
+  comment         String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+// User-Book relationship for "vouched by" or "wishlist" if needed.
+// This is a minimal schema focusing on core flows.

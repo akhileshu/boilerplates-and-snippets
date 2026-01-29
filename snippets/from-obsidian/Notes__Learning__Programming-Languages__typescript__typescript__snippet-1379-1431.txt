@@ -1,0 +1,53 @@
+        ```TypeScript
+        //base interface insted of union-'always code to an interface, never to an implementation' idea
+        
+        interface Schedule {
+          day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+          wake: Time;
+          sleep: Time;
+        }
+        
+        interface WeekdaySchedule extends Schedule {
+          day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday";
+          startWork: Time;
+          endWork: Time;
+        }
+        
+        interface WeekendSchedule extends Schedule {
+          day: "Saturday" | "Sunday";
+          familyMeal: Time;
+        }
+        
+        declare function printSchedule(schedule: Schedule);
+        
+        function printSchedule(schedule: Schedule) {
+        
+           printDayWakeSleep(schedule)
+            
+            if ("startWork" in schedule) {
+                printStartEndWork(schedule as WeekdaySchedule); // Type assertion to WeekdaySchedule
+            } else if ("familyMeal" in schedule) {
+                printFamilyMeal(schedule as WeekendSchedule); // Type assertion to WeekendSchedule
+            }
+        }
+        
+        // Example usage
+        const weekdaySchedule: WeekdaySchedule = {
+            day: "Monday",
+            wake: "7:00 AM",
+            startWork: "9:00 AM",
+            endWork: "5:00 PM",
+            sleep: "11:00 PM",
+        };
+        
+        const weekendSchedule: WeekendSchedule = {
+            day: "Saturday",
+            wake: "9:00 AM",
+            familyMeal: "1:00 PM",
+            sleep: "12:00 AM",
+        };
+        
+        printSchedule(weekdaySchedule);
+        printSchedule(weekendSchedule);
+        
+        ```

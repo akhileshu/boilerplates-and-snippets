@@ -1,0 +1,61 @@
+	:root {
+        --bs-body-font-size: 14px;
+        --bs-body-font-size-sm: 12.25px;
+        --bs-body-font-size-lg: 15.75px;
+        
+        /* Heading sizes */
+        --bs-heading-font-size-h1: 2.1875rem;  /* 35px */
+        --bs-heading-font-size-h2: 1.75rem;    /* 28px */
+        --bs-heading-font-size-h3: 1.53125rem; /* 24.5px */
+        --bs-heading-font-size-h4: 1.3125rem;  /* 21px */
+        --bs-heading-font-size-h5: 1.09375rem; /* 17.5px */
+        --bs-heading-font-size-h6: 0.875rem;   /* 14px */
+    }
+    /*HRSF-54048-NLCP UAT: Print formatting for TR statements*/
+    [itemid="GRID_LAYOUT_COLUMN_1560283162225_0"] .widgetGRID_LAYOUT:not([class*="bg-"]):not([style*="background"]),.widgetGRID_LAYOUT_COLUMN:not([class*="bg-"]):not([style*="background"]) {
+		background-color: unset;
+	}
+    body {
+        font-size: var(--bs-body-font-size);
+		zoom:80%;
+    }
+    
+    h1, .h1 { font-size: var(--bs-heading-font-size-h1); }
+    h2, .h2 { font-size: var(--bs-heading-font-size-h2); }
+    h3, .h3 { font-size: var(--bs-heading-font-size-h3); }
+    h4, .h4 { font-size: var(--bs-heading-font-size-h4); }
+    h5, .h5 { font-size: var(--bs-heading-font-size-h5); }
+    h6, .h6 { font-size: var(--bs-heading-font-size-h6); }
+    
+    /* Adjust display classes if needed */
+    .display-1 { font-size: calc(var(--bs-heading-font-size-h1) * 1.7); }
+    .display-2 { font-size: calc(var(--bs-heading-font-size-h1) * 1.575); }
+    .display-3 { font-size: calc(var(--bs-heading-font-size-h1) * 1.45); }
+    .display-4 { font-size: calc(var(--bs-heading-font-size-h1) * 1.325); }
+    .display-5 { font-size: calc(var(--bs-heading-font-size-h1) * 1.2); }
+    .display-6 { font-size: calc(var(--bs-heading-font-size-h1) * 1.1); }
+    
+    /* Small and large text utilities */
+    .small, small {
+        font-size: var(--bs-body-font-size-sm) !important;
+    }
+    
+    .fs-6 { font-size: var(--bs-body-font-size) !important; }
+    .fs-5 { font-size: var(--bs-body-font-size-lg) !important; }
+    .fs-4 { font-size: var(--bs-heading-font-size-h6) !important; }
+    .fs-3 { font-size: var(--bs-heading-font-size-h5) !important; }
+    .fs-2 { font-size: var(--bs-heading-font-size-h4) !important; }
+    .fs-1 { font-size: var(--bs-heading-font-size-h3) !important; }
+
+
+
+xx.print_preview_spreadsheet > .webixClearfix {
+	border:1px solid red!important;
+	float:none!important;
+	clear: both!important;
+	display:block!important;
+	border:1px solid red!important;
+}
+xx.print_preview_spreadsheet .spreadsheet-page-break {
+    page-break-after: always!important;
+}

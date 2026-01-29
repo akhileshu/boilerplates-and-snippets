@@ -1,0 +1,264 @@
+/**********************************************************************
+v 2.0
+
+ 🧭 Learning Dashboard (No Reload)
+ 🔹 Toggle any column live — no refresh
+ 🔹 Persists column visibility via localStorage
+ 🔹 Shows ALL folders (even without index files)
+ 🔹 First column: Only direct subfolders of root
+ **********************************************************************/
+
+const ROOT = "Notes/Learning";
+const STORAGE_KEY = "learningDashboardColumns";
+
+// --- Column configuration ---
+const columns = [
+  { key: "folder", label: "📂 Folder" },
+  { key: "tags", label: "🏷️ Tags" },
+  { key: "summary", label: "🧠 Summary" },
+  { key: "stats", label: "📈 Stats" },
+  { key: "notes", label: "📄 Notes" },
+];
+
+// --- Load saved column visibility ---
+let savedConfig = {};
+try {
+  savedConfig = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+} catch {
+  savedConfig = {};
+}
+columns.forEach(c => {
+  if (savedConfig[c.key] === undefined) savedConfig[c.key] = true;
+});
+
+// --- Get direct subfolders of ROOT ---
+function getDirectSubfolders() {
+  const allPages = dv.pages(`"${ROOT}"`);
+  
+  // Get all unique direct subfolders
+  const directSubfolders = new Set();
+  
+  // Add root itself as first entry
+  directSubfolders.add(ROOT);
+  
+  // Extract direct subfolders from all files
+  allPages.forEach(page => {
+    if (page.file.folder && page.file.folder.startsWith(ROOT + "/")) {
+      // Get the direct subfolder path (one level deep)
+      const pathParts = page.file.folder.split("/");
+      const rootParts = ROOT.split("/").length;
+      
+      if (pathParts.length > rootParts) {
+        // Construct direct subfolder path
+        const directSubfolder = ROOT + "/" + pathParts[rootParts];
+        directSubfolders.add(directSubfolder);
+      }
+    }
+  });
+  
+  // Convert to array and sort
+  const folders = Array.from(directSubfolders).sort();
+  
+  // Move root to the top if it exists
+  const rootIndex = folders.indexOf(ROOT);
+  if (rootIndex > 0) {
+    folders.splice(rootIndex, 1);
+    folders.unshift(ROOT);
+  }
+  
+  return folders;
+}
+
+// --- Get folder info with index file detection ---
+function getFolderInfo(folderPath) {
+  const folderNotes = dv.pages(`"${folderPath}"`)
+    .where(p => {
+      const isIndex = p.file.name.toLowerCase() === "index";
+      return !isIndex && p.file.folder === folderPath;
+    });
+  
+  // Look for index file in this folder
+  const possibleIndexNames = ["index", "Index", "INDEX"];
+  let indexFile = null;
+  
+  for (const name of possibleIndexNames) {
+    const files = dv.pages(`"${folderPath}/${name}"`);
+    if (files.length > 0) {
+      indexFile = files[0];
+      break;
+    }
+  }
+  
+  // Also check using folder query as fallback
+  if (!indexFile) {
+    const files = dv.pages(`"${folderPath}"`)
+      .where(p => p.file.name.toLowerCase() === "index" && p.file.folder === folderPath);
+    if (files.length > 0) {
+      indexFile = files[0];
+    }
+  }
+  
+  return {
+    path: folderPath,
+    name: folderPath === ROOT ? "Learning (Root)" : folderPath.split("/").pop(),
+    count: folderNotes.length,
+    indexFile: indexFile,
+    tags: indexFile?.tags || [],
+    description: indexFile?.description || indexFile?.summary || "—"
+  };
+}
+
+// --- Recursive helper for rendering ALL notes in folder hierarchy ---
+function renderAllNotes(folderPath, depth = 0) {
+  const indent = "&nbsp;".repeat(depth * 4);
+  
+  // Get non-index files in current folder
+  const files = dv.pages(`"${folderPath}"`)
+    .where(p => {
+      const isIndex = p.file.name.toLowerCase() === "index";
+      return !isIndex && p.file.folder === folderPath;
+    })
+    .sort(p => p.file.name);
+
+  let result = "";
+  
+  // Render files in current folder
+  for (const note of files) {
+    result += `${indent}• [[${note.file.path}|${note.file.name}]]<br>`;
+  }
+  
+  // Find and render nested subfolders recursively
+  const allPages = dv.pages(`"${ROOT}"`);
+  const allFolders = new Set();
+  
+  // Collect all folders from all pages
+  allPages.forEach(page => {
+    if (page.file.folder && page.file.folder.startsWith(folderPath + "/")) {
+      allFolders.add(page.file.folder);
+    }
+  });
+  
+  // Get immediate subfolders
+  const immediateSubfolders = Array.from(allFolders)
+    .filter(f => {
+      const parentPath = f.substring(0, f.lastIndexOf("/"));
+      return parentPath === folderPath;
+    })
+    .sort();
+  
+  // Recursively render each immediate subfolder
+  for (const subfolder of immediateSubfolders) {
+    const subfolderName = subfolder.split("/").pop();
+    const subfolderNotes = dv.pages(`"${subfolder}"`)
+      .where(p => {
+        const isIndex = p.file.name.toLowerCase() === "index";
+        return !isIndex && p.file.folder === subfolder;
+      }).length;
+    
+    result += `${indent}<span class="folder-label">📂 ${subfolderName} (${subfolderNotes})</span><br>`;
+    result += renderAllNotes(subfolder, depth + 1);
+  }
+  
+  return result || `${indent}—<br>`;
+}
+
+// --- Build table ---
+const directFolders = getDirectSubfolders();
+const headers = columns.map(c => c.label);
+
+dv.table(
+  headers,
+  directFolders.map(folderPath => {
+    const folderInfo = getFolderInfo(folderPath);
+    const isRoot = folderPath === ROOT;
+
+    const clickableTags = folderInfo.tags?.length
+      ? folderInfo.tags.map(t => `<span class="tag-item">#${t}</span><br>`).join(" ")
+      : "—";
+
+    // Render ALL notes including those in nested subfolders
+    const linkedNotes = isRoot
+      ? dv.pages(`"${ROOT}"`)
+          .where(p => p.file.name !== "index" && p.file.folder === ROOT)
+          .sort(p => p.file.name)
+          .map(note => `• [[${note.file.path}|${note.file.name}]]<br>`)
+          .join("")
+      : renderAllNotes(folderPath);
+
+    // Create folder display (link if index exists)
+    let folderDisplay;
+    if (isRoot) {
+      folderDisplay = "Learning (Root)";
+    } else if (folderInfo.indexFile) {
+      folderDisplay = `[[${folderInfo.indexFile.file.path}|${folderInfo.name}]]`;
+    } else {
+      folderDisplay = folderInfo.name;
+    }
+
+    const row = {
+      folder: folderDisplay,
+      tags: clickableTags,
+      summary: folderInfo.description,
+      stats: folderInfo.count > 0 ? `${folderInfo.count} notes` : "—",
+      notes: linkedNotes || "—",
+    };
+
+    return columns.map(c => row[c.key]);
+  })
+);
+
+// --- Toolbar creation ---
+const table = this.container.querySelector("table");
+const toolbar = document.createElement("div");
+toolbar.style.marginBottom = "0.75em";
+toolbar.innerHTML = `
+  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:1em;">
+    ${columns
+      .map(
+        (c, i) => `
+        <label style="display:flex;align-items:center;gap:0.3em;">
+          <input type="checkbox" data-col="${i}" data-key="${c.key}" ${
+          savedConfig[c.key] ? "checked" : ""
+        }>
+          <span>${c.label}</span>
+        </label>`
+      )
+      .join("")}
+    <button id="resetColumns" style="margin-left:1em;padding:2px 6px;border:none;border-radius:4px;background:var(--interactive-accent);color:white;cursor:pointer;">⟳ Reset</button>
+  </div>
+`;
+this.container.prepend(toolbar);
+
+// --- Hide columns based on saved config ---
+function applyVisibility() {
+  table.querySelectorAll("tr").forEach(row => {
+    row.querySelectorAll("th, td").forEach((cell, i) => {
+      const colKey = columns[i]?.key;
+      if (colKey) cell.style.display = savedConfig[colKey] ? "" : "none";
+    });
+  });
+}
+applyVisibility();
+
+// --- Toggle columns live ---
+toolbar.querySelectorAll('input[type="checkbox"]').forEach(input => {
+  input.addEventListener("change", e => {
+    const key = e.target.dataset.key;
+    const colIndex = parseInt(e.target.dataset.col);
+    const visible = e.target.checked;
+    savedConfig[key] = visible;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedConfig));
+    table.querySelectorAll("tr").forEach(row => {
+      const cell = row.children[colIndex];
+      if (cell) cell.style.display = visible ? "" : "none";
+    });
+  });
+});
+
+// --- Reset button ---
+toolbar.querySelector("#resetColumns").addEventListener("click", () => {
+  columns.forEach(c => (savedConfig[c.key] = true));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(savedConfig));
+  applyVisibility();
+  toolbar.querySelectorAll('input[type="checkbox"]').forEach(cb => (cb.checked = true));
+});

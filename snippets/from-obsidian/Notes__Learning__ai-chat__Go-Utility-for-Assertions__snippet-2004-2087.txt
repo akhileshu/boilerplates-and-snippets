@@ -1,0 +1,12 @@
+		http.StatusCreated},
+	{"Content-Type", resp.Header.Get("Content-Type"),
+		"application/json"},
+	{"X-Custom-Header", resp.Header.Get("X-Custom-Header"),
+		"proxy-test"},
+}
+
+for _, tc := range tests {
+	t.Run(tc.name, func(t *testing.T) {
+		assert.EqualMsg(t, tc.name, tc.got, tc.want)
+	})
+}

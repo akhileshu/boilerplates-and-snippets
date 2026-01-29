@@ -1,0 +1,98 @@
+    
+* Separator adapts to terminal width
+    
+* Stats are useful but not noisy
+    
+* Easy to extend later (exit code, duration)
+    
+
+* * *
+
+## Natural next upgrades (optional)
+
+If/when you want:
+
+* show **exit code** (`cmd.ProcessState.ExitCode()`)
+    
+* show **execution time**
+    
+* clear output with `c`
+    
+* toggle focus with `Tab`
+    
+
+But honestly — **this is already a solid CLI UX**.
+
+You’ve built something _real_ here 👍
+
+* * *
+
+**You:**
+
+ok , so we have developed a terminal app - where we just want user to select what to do and run cmd - limitations - non interactive 
+
+* * *
+
+**ChatGPT:**
+
+Exactly 👍  
+You’ve nailed the **correct mental model** of what you built.
+
+Let me summarize it **clearly and honestly**, including the _limitations_ — this is important engineering thinking.
+
+* * *
+
+## What you’ve actually built
+
+You built a **command launcher TUI**.
+
+> A terminal app whose job is:
+> 
+> * show a list of actions
+>     
+> * let the user select one
+>     
+> * run a command
+>     
+> * show its output
+>     
+> * repeat
+>     
+
+That’s a **valid, useful category** of tool.
+
+Examples in the wild:
+
+* internal dev tools
+    
+* cleanup utilities
+    
+* build/test runners
+    
+* infra scripts
+    
+* onboarding helpers
+    
+
+* * *
+
+## What it is NOT (by design)
+
+It is **not**:
+
+* a shell replacement
+    
+* an interactive REPL
+    
+* a terminal multiplexer
+    
+* a fully interactive command environment
+    
+
+And that’s **totally fine**.
+
+* * *
+
+## Core limitation (fundamental, not a bug)
+
+> **Commands are non-interactive**

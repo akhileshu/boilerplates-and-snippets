@@ -1,0 +1,115 @@
+// packages/search/meilisearch.ts
+import { MeiliSearch } from 'meilisearch'
+
+export class SearchService {
+  private client: MeiliSearch
+
+  constructor() {
+    this.client = new MeiliSearch({
+      host: process.env.MEILISEARCH_URL!,
+      apiKey: process.env.MEILISEARCH_API_KEY!,
+    })
+  }
+
+  async initIndex() {
+    const index = this.client.index('products')
+    
+    await index.updateSettings({
+      searchableAttributes: [
+        'name',
+        'description',
+        'category',
+        'brand',
+        'tags'
+      ],
+      filterableAttributes: [
+        'category',
+        'brand',
+        'price',
+        'inventory',
+        'isActive'
+      ],
+      sortableAttributes: [
+        'price',
+        'createdAt',
+        'name'
+      ],
+      rankingRules: [
+        'words',
+        'typo',
+        'proximity',
+        'attribute',
+        'sort',
+        'exactness'
+      ],
+      synonyms: {
+        'tv': ['television'],
+        'cellphone': ['mobile', 'smartphone'],
+        'laptop': ['notebook']
+      }
+    })
+
+    return index
+  }
+
+  async indexProducts(products: any[]) {
+    const index = await this.initIndex()
+    return await index.addDocuments(products)
+  }
+
+  async searchProducts(query: string, filters: any = {}, options: any = {}) {
+    const index = this.client.index('products')
+    
+    const filterConditions = []
+    
+    if (filters.category) {
+      filterConditions.push(`category = "${filters.category}"`)
+    }
+    
+    if (filters.brand) {
+      filterConditions.push(`brand = "${filters.brand}"`)
+    }
+    
+    if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+      const minPrice = filters.minPrice || 0
+      const maxPrice = filters.maxPrice || 999999
+      filterConditions.push(`price >= ${minPrice} AND price <= ${maxPrice}`)
+    }
+
+    if (filters.inStock) {
+      filterConditions.push('inventory > 0')
+    }
+
+    const filterString = filterConditions.length > 0 ? filterConditions.join(' AND ') : undefined
+
+    return await index.search(query, {
+      filter: filterString,
+      sort: options.sort ? [`${options.sort}:${options.order || 'asc'}`] : undefined,
+      limit: options.limit || 20,
+      offset: options.offset || 0,
+      attributesToRetrieve: ['*'],
+      attributesToHighlight: ['name', 'description'],
+      facets: ['category', 'brand', 'price']
+    })
+  }
+
+  async getFacets() {
+    const index = this.client.index('products')
+    return await index.search('', {
+      facets: ['category', 'brand'],
+      limit: 0
+    })
+  }
+
+  async deleteProduct(productId: string) {
+    const index = this.client.index('products')
+    return await index.deleteDocument(productId)
+  }
+
+  async updateProduct(product: any) {
+    const index = this.client.index('products')
+    return await index.updateDocuments([product])
+  }
+}
+
+export const searchService = new SearchService()

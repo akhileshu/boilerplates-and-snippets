@@ -1,0 +1,57 @@
+{
+  "assert.Equal": {
+    "prefix": "aeq",
+    "body": [
+      "assert.Equal(t, ${1:got}, ${2:want})"
+    ],
+    "description": "assert Equal"
+  },
+
+  "assert.NotEqual": {
+    "prefix": "aneq",
+    "body": [
+      "assert.NotEqual(t, ${1:got}, ${2:notWant})"
+    ],
+    "description": "assert NotEqual"
+  },
+
+  "assert.SliceEqual": {
+    "prefix": "aseq",
+    "body": [
+      "assert.SliceEqual(t, ${1:got}, ${2:want})"
+    ],
+    "description": "assert SliceEqual"
+  },
+
+  "assert.NoError": {
+    "prefix": "anoerr",
+    "body": [
+      "assert.NoError(t, ${1:err})"
+    ],
+    "description": "assert NoError"
+  },
+
+  "assert.ErrorIs": {
+    "prefix": "aerris",
+    "body": [
+      "assert.ErrorIs(t, ${1:err}, ${2:targetErr})"
+    ],
+    "description": "assert ErrorIs"
+  },
+
+  "assert.Nil": {
+    "prefix": "anil",
+    "body": [
+      "assert.Nil(t, ${1:ptr})"
+    ],
+    "description": "assert Nil"
+  },
+
+  "assert.NotNil": {
+    "prefix": "annil",
+    "body": [
+      "assert.NotNil(t, ${1:ptr})"
+    ],
+    "description": "assert NotNil"
+  }
+}

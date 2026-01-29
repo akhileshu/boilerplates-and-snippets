@@ -1,0 +1,1 @@
+panic: could not open a new TTY: open /dev/tty: no such device

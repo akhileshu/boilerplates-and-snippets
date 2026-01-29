@@ -1,0 +1,37 @@
+  }
+
+  const [popularSearches, totalSearches, noResultSearches] = await Promise.all([
+    // Popular searches
+    prisma.searchAnalytics.groupBy({
+      by: ['query'],
+      _count: {
+        query: true,
+      },
+      where,
+      orderBy: {
+        _count: {
+          query: 'desc',
+        },
+      },
+      take: limit,
+    }),
+
+    // Total searches
+    prisma.searchAnalytics.count({ where }),
+
+    // Searches with no results
+    prisma.searchAnalytics.count({
+      where: {
+        ...where,
+        results: 0,
+      },
+    }),
+  ])
+
+  return {
+    popularSearches,
+    totalSearches,
+    noResultSearches,
+    noResultRate: totalSearches > 0 ? (noResultSearches / totalSearches) * 100 : 0,
+  }
+}),

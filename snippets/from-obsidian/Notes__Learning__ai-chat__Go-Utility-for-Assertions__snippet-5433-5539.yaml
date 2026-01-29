@@ -1,0 +1,4 @@
+- name: Run tests
+  cmd: go test ./...
+- name: Clean deps
+  cmd: rm -rf node_modules

@@ -1,0 +1,68 @@
+model Task {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  tags        String[]
+  what        String   // Problem to solve
+  why         String   // Business context
+  how         String   // Tech approach
+
+  status SubtaskStatus @default(OPEN)
+
+  // 🧪 Engineering Execution
+  expectedOutcome   String?
+  actualOutcome     OutcomeStatus?
+  pivotReason       String?
+  challenges        String?
+  decisionCriteria  String?
+  shippingImperfect Boolean @default(false)
+  improvementPlan   String?
+  atomicTasks       Json       // { api: [], db: [], ui: [] }
+  reusableAssetNote String?
+  userFlowDiagram   String?
+  resourcesUsed     String[]
+
+  // 🧠 Knowledge Management
+  documentationLinks String[]   // Related wikis, guides, or decision docs
+  lessonsLearned     String?    // Summary after completion
+  retrospectiveNotes String?    // Feedback from review
+
+  // 📈 Product / Business Impact
+  expectedImpact       String?
+  actualImpact         String?
+  impactMetrics        Json?     // e.g. { signups: +12%, churn: -4% }
+  customerFeedbackLink String?
+  marketImpactNotes    String?
+
+  // 📊 Analytics & Insights
+  analyticsData   Json?
+  analyticsLink   String?
+  analyticsNotes  String?
+
+  // 🔄 Planning & Dependencies
+  dependsOnTaskId String?
+  dependsOnTask   Task? @relation("TaskDependencies", fields: [dependsOnTaskId], references: [id])
+  relatedTasks    Task[] @relation("TaskDependencies")
+
+  // 👥 Collaboration
+  comments        Comment[]
+  documents       Document[]
+
+  // 🕓 Time & Resource Tracking
+  startDate DateTime?
+  endDate   DateTime?
+  estimatedTime Int? // in minutes
+  actualTime    Int? // auto-calculated from WorkLogs
+  workLogs      WorkLog[]
+
+  // 🔗 Relationships
+  featureId  String
+  feature    Feature @relation(fields: [featureId], references: [id])
+  assigneeId String?
+  assignee   User?   @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  reporterId String?
+  reporter   User?   @relation("ReportedTasks", fields: [reporterId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

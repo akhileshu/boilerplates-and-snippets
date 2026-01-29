@@ -1,0 +1,181 @@
+✅ Install Docker & Docker Compose
+
+✅ Understand **containers vs. VMs**
+
+✅ Run a container (`docker run -d nginx`)
+
+✅ Build a custom image with a **Dockerfile**
+
+✅ Use **volumes** for data persistence
+
+✅ Expose a container to a port (`-p 8080:80`)
+
+✅ Inspect a running container (`docker ps`, `docker inspect`)
+
+✅ Understand **bind mounts vs. named volumes**
+
+✅ Use **environment variables** in containers
+
+✅ Network multiple containers (`docker network create`)
+
+---
+
+### **2. Dockerfile & Image Optimization (8 Tasks)**
+
+✅ Write a **Dockerfile** with best practices
+
+✅ Use **multi-stage builds** to reduce image size
+
+✅ Choose a **lightweight base image** (e.g., `node:alpine`)
+
+✅ Minimize layers (`RUN apt-get update && apt-get install -y curl`)
+
+✅ Use `.dockerignore` to exclude unnecessary files
+
+✅ Implement **HEALTHCHECK** in Dockerfile
+
+✅ Set `CMD` vs `ENTRYPOINT` properly
+
+✅ Run the container as a **non-root user**
+
+---
+
+### **3. Docker Compose (7 Tasks)**
+
+✅ Write a `docker-compose.yml` file
+
+✅ Use **multiple services** (e.g., `web`, `db`, `cache`)
+
+✅ Define environment variables in `env_file`
+
+✅ Set restart policies (`restart: always`)
+
+✅ Use **named volumes** for databases
+
+✅ Use **depends_on** for service dependencies
+
+✅ Override configs with `docker-compose.override.yml`
+
+---
+
+### **4. Networking & Storage (6 Tasks)**
+
+✅ Understand **Bridge vs. Host vs. Overlay** networks
+
+✅ Create a custom network (`docker network create app-network`)
+
+✅ Connect multiple containers to a **shared network**
+
+✅ Persist database data using **volumes**
+
+✅ Use **tmpfs** mounts for in-memory storage
+
+✅ Secure communication using **TLS certificates**
+
+---
+
+### **5. Security Best Practices (7 Tasks)**
+
+✅ Scan images for vulnerabilities (`docker scan <image>`)
+
+✅ Use **non-root users** in containers
+
+✅ Remove unnecessary packages in images
+
+✅ Limit container resource usage (`--memory=512m --cpus=1.5`)
+
+✅ Use **read-only filesystem** (`--read-only`)
+
+✅ Store secrets securely (**Docker secrets, Vault**)
+
+✅ Restrict container privileges (`--cap-drop=ALL`)
+
+---
+
+### **6. Production Deployment (8 Tasks)**
+
+✅ Push images to **Docker Hub / AWS ECR / GCR**
+
+✅ Deploy Docker on a **cloud server (AWS, DigitalOcean, GCP)**
+
+✅ Use **Nginx as a reverse proxy** for a containerized app
+
+✅ Set up **Let's Encrypt SSL (Certbot + Nginx)**
+
+✅ Auto-restart containers (`restart: unless-stopped`)
+
+✅ Configure logs to persist (`docker logs`, `fluentd`)
+
+✅ Optimize for **low memory & CPU usage**
+
+✅ Use a process manager (`supervisord`, `systemd`) for container uptime
+
+---
+
+### **7. Docker Swarm / Kubernetes (10 Tasks)**
+
+✅ Understand **Docker Swarm basics**
+
+✅ Deploy a **Docker Swarm stack**
+
+✅ Scale services (`docker service scale web=3`)
+
+✅ Load balance traffic using **Swarm Routing Mesh**
+
+✅ Deploy to **Kubernetes (K8s)**
+
+✅ Understand **Pods, Deployments, Services**
+
+✅ Use **ConfigMaps & Secrets** in K8s
+
+✅ Set up **Ingress for domain-based routing**
+
+✅ Monitor K8s with **Prometheus + Grafana**
+
+✅ Deploy with **Helm Charts**
+
+---
+
+### **8. CI/CD with Docker (6 Tasks)**
+
+✅ Automate builds with **GitHub Actions / GitLab CI/CD**
+
+✅ Write a **Dockerized CI/CD pipeline**
+
+✅ Push Docker images on every commit (`docker push`)
+
+✅ Deploy using **watchtower / rolling updates**
+
+✅ Set up **zero-downtime deployments**
+
+✅ Automate security scans in CI/CD
+
+---
+
+### **9. Monitoring & Debugging (6 Tasks)**
+
+✅ View container logs (`docker logs <container_id>`)
+
+✅ Execute a shell inside a running container (`docker exec -it`)
+
+✅ Inspect CPU/memory usage (`docker stats`)
+
+✅ Monitor containers with **Prometheus + Grafana**
+
+✅ Debug issues with **Docker events** (`docker events`)
+
+✅ Use **cAdvisor** for real-time monitoring
+
+---
+
+### **10. Hands-on Project Checklist (5 Tasks)**
+
+✅ **Dockerize a full-stack app** (React + Node + MongoDB)
+
+✅ **Deploy on AWS/GCP/DigitalOcean** with Docker Compose
+
+✅ **Secure with SSL + Nginx reverse proxy**
+
+✅ **Use Kubernetes to scale**
+
+✅ **Set up monitoring & auto-recovery**

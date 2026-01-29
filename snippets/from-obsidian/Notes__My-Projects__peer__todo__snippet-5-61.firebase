@@ -1,0 +1,54 @@
+
+{
+  "rules": {
+    "status": {
+      "$userId": {
+        // 👇 Allow read to anyone (or restrict if needed)
+        ".read": "auth != null",
+
+        // 👇 Only allow the user to write to their own status , this will not work as we are using next auth insted of firebase auth
+        ".write": "auth != null && auth.uid === $userId",
+
+        // 👇 Optional: Validate structure
+        ".validate": "newData.hasChildren(['state', 'lastChanged'])",
+
+        "state": {
+          ".validate": "newData.isString() && (newData.val() === 'ONLINE' || newData.val() === 'AWAY' || newData.val() === 'OFFLINE')"
+        },
+        "lastChanged": {
+          ".validate": "newData.isNumber()"
+        }
+      }
+    },
+      "chats": {
+      "$chatId": {
+        ".read": true,  
+        ".write": true,  
+
+        "messages": {
+          "$messageId": {
+            // Every message must contain senderId, text, createdAt
+            ".validate": "newData.hasChildren(['senderId','text','createdAt'])",
+
+            "senderId": {
+              ".validate": "newData.isString()"
+            },
+            "text": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            },
+            "createdAt": {
+              ".validate": "newData.isNumber()"
+            }
+          }
+        },
+
+        "participants": {
+          "$uid": {
+            ".validate": "newData.isBoolean()"
+          }
+        }
+      }
+    }
+  }
+}
+

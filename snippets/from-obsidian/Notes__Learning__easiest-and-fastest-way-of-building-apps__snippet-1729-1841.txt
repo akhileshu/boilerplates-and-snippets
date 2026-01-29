@@ -1,0 +1,50 @@
+const file = req.file;
+if (!file) return res.status(400).json({ error: "No file uploaded" });
+
+const outputDir = `public/videos/${file.filename}`;
+fs.mkdirSync(outputDir, { recursive: true });
+
+const resolutions = [
+  { name: "360p", size: "640x360", bitrate: "800k", codec: "libx264" },
+  { name: "720p", size: "1280x720", bitrate: "2500k", codec: "libx264" },
+];
+
+const startTime = Date.now();
+
+const processVideo = (r: any) =>
+  new Promise<void>((resolve, reject) => {
+    const cmd = ffmpeg(file.path)
+      .videoCodec(r.codec)
+      .size(r.size)
+      .videoBitrate(r.bitrate)
+      .outputOptions(["-preset veryfast", "-hls_time 10", "-hls_list_size 0", "-hls_flags independent_segments"])
+      .output(path.join(outputDir, `${r.name}.m3u8`))
+      .on("progress", (p) => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        const eta = p.percent ? ((100 - p.percent) * elapsed) / p.percent : 0;
+        currentProgress = {
+          percent: Number(p.percent.toFixed(1)),
+          eta: `${eta.toFixed(1)}s`,
+        };
+      })
+      .on("end", resolve)
+      .on("error", reject);
+    cmd.run();
+  });
+
+try {
+  await Promise.all(resolutions.map(processVideo));
+  currentProgress = { percent: 100, eta: "0s" };
+
+  const masterPlaylist = resolutions
+    .map(
+      (r) =>
+        `#EXT-X-STREAM-INF:BANDWIDTH=${r.bitrate.replace("k", "000")},RESOLUTION=${r.size}\n${r.name}.m3u8`
+    )
+    .join("\n");
+  fs.writeFileSync(path.join(outputDir, "index.m3u8"), `#EXTM3U\n${masterPlaylist}`);
+  fs.unlinkSync(file.path);
+  res.status(200).json({ url: `/videos/${file.filename}/index.m3u8` });
+} catch (e: any) {
+  res.status(500).json({ error: e.message });
+}

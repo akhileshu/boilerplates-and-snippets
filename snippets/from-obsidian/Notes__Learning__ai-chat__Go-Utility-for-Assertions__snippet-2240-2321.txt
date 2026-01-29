@@ -1,0 +1,29 @@
+
+Because:
+
+* `any` removes type safety
+    
+* Mistakes move to runtime
+    
+
+### ✅ Better version (recommended)
+
+Split by type:
+
+```go
+statusTests := []struct {
+	name string
+	got  int
+	want int
+}{
+	{"status", resp.StatusCode, http.StatusCreated},
+}
+
+headerTests := []struct {
+	name string
+	got  string
+	want string
+}{
+	{"Content-Type", resp.Header.Get("Content-Type"), "application/json"},
+	{"X-Custom-Header", resp.Header.Get("X-Custom-Header"), "proxy-test"},
+}

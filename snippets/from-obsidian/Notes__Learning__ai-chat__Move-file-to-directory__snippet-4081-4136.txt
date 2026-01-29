@@ -1,0 +1,4 @@
+ai ask        → reasoning / explanation
+ai ctx file   → show context
+ai edit file  → propose diff (markdown)
+ai apply      → apply last diff

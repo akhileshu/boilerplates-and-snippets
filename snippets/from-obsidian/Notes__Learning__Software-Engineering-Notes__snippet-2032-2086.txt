@@ -1,0 +1,55 @@
+        ```TypeScript
+        // is_prime.js
+        // process ->here its child process
+        
+        //parent invoked me
+        process.on("message", (message) => {
+            const jsonResponse = isPrime(message.number);
+            process.send(jsonResponse);
+            process.exit() //!important else its orphan
+        });
+        
+        function isPrime(num) {
+          if (num <= 1) {
+            return false;
+          }
+          for (let i = 2; i < num; i++) {
+            if (num % i === 0) {
+              return false;
+            }
+          }
+          return true;
+        }
+        
+        module.exports = isPrime;
+        
+        // index.js
+        const express = require('express');
+        const { fork } = require('child_process');
+        
+        const app = express();
+        const port = 3000;
+        
+        // process ->here its parent process
+        
+        app.get('/is-prime/:number', (req, res) => {
+          const number = parseInt(req.params.number);
+          //forking / cloning a process every time receive a request
+          const childProcess = fork('./is_prime.js');
+        
+          childProcess.send(number);
+        
+        //triggers when child process is executed, send response 
+          childProcess.on('message', (isPrime) => {
+            res.json({
+              number,
+              isPrime,
+            });
+            childProcess.kill();
+          });
+        });
+        
+        app.listen(port, () => {
+          console.log(`Server listening on port ${port}`);
+        });
+        ```

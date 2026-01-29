@@ -1,0 +1,21 @@
+    {/* Main Content */}
+    <div className="lg:col-span-3">
+      <SearchHeader
+        query={search.query}
+        onQueryChange={search.setQuery}
+        suggestions={search.suggestions}
+        sortBy={search.sortBy}
+        onSortByChange={search.setSortBy}
+        sortOrder={search.sortOrder}
+        onSortOrderChange={search.setSortOrder}
+        resultsCount={search.searchData?.totalCount || 0}
+      />
+
+      <DataGrid
+        data={search.searchData?.data || []}
+        isLoading={search.isLoading}
+        renderItem={renderItem}
+      />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+- FFmpeg can generate multiple HLS streams at different qualities.
+    
+- Update `.m3u8` to include variants → player chooses automatically.
+    
+
+`ffmpeg -i input.mp4 \ -map 0:v -map 0:a -c:v libx264 -b:v 800k -s 640x360 -f hls out_360.m3u8 \ -map 0:v -map 0:a -c:v libx264 -b:v 1200k -s 1280x720 -f hls out_720.m3u8`

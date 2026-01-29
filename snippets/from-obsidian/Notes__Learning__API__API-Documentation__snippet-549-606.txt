@@ -1,0 +1,30 @@
+- related data :
+    
+    ![[image 2 3.png|image 2 3.png]]
+    
+    ![[image 3 2.png|image 3 2.png]]
+    
+- resolver
+    
+    defines how to resolve request for entry points
+
+---
+
+## index.md
+
+## 📌 Overview
+Brief description of this folder.
+
+## 📝 Files in this Folder:
+
+- [[archieve/Tools - Technologies - Stack/API & Documentation/GraphQL - notes]]
+- [[archieve/Tools - Technologies - Stack/API & Documentation/10.📌 OpenAPI – Quick Reference (Cheat Sheet)]]
+- [[archieve/Tools - Technologies - Stack/API & Documentation/11.📌 GraphQL Code Generator – Quick Reference (Cheat Sheet)]]
+- [[archieve/Tools - Technologies - Stack/API & Documentation/12.📌 Postman – Quick Reference (Cheat Sheet)]]
+
+## 🔗 Related
+- 
+
+
+---
+

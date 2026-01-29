@@ -1,0 +1,10 @@
+	}),
+	table.WithRows(rows),
+	table.WithFocused(true),
+	table.WithHeight(10),
+)
+
+p := tea.NewProgram(model{table: t})
+if _, err := p.Run(); err != nil {
+	panic(err)
+}

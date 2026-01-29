@@ -1,0 +1,15 @@
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 10px 14px;
+  background: #0f172a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+`;
+
+btn.addEventListener('click', saveChat);
+document.body.appendChild(btn);
