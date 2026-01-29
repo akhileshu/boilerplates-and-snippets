@@ -1,0 +1,57 @@
+model Task {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  tags        String[] // Grouping/filtering
+  what        String   // Problem statement
+  why         String   // Why this matters
+  how         String   // Approach
+
+  status      SubtaskStatus @default(OPEN)
+
+  // Engineering Details
+  expectedOutcome   String?
+  actualOutcome     OutcomeStatus?
+  pivotReason       String?
+  challenges        String?
+  decisionCriteria  String?
+  shippingImperfect Boolean @default(false)
+  improvementPlan   String?
+  estimatedTime     Int?
+  actualTime        Int?
+
+  atomicTasks       Json // { api: [], db: [], ui: [] }
+  reusableAssetNote String?
+  resourcesUsed     String[]
+  userFlowDiagram   String?
+  documentationLinks String[]
+
+  // Cleaned-up structured fields
+  productImpact Json?   // { expected: "", actual: "", metrics: {} }
+  analytics     Json?   // { data: {}, link: "", notes: "" }
+  insights      Json?   // { lessons: "", wins: "", improvements: "" }
+
+  // Relations
+  featureId  String
+  feature    Feature @relation(fields: [featureId], references: [id])
+  assigneeId String?
+  assignee   User?   @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  reporterId String?
+  reporter   User?   @relation("ReportedTasks", fields: [reporterId], references: [id])
+
+  // New optional structured relations
+  goalId     String?
+  goal       Goal? @relation(fields: [goalId], references: [id])
+  personaId  String?
+  persona    UserPersona? @relation(fields: [personaId], references: [id])
+  experiment Experiment?
+  taskRisk   Risk?
+
+  // Extras
+  comments   Comment[]
+  documents  Document[]
+  workLogs   WorkLog[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

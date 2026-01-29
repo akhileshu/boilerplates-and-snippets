@@ -1,0 +1,19 @@
+query,
+setQuery,
+filters,
+setFilters,
+updateFilter,
+clearFilters,
+sortBy,
+setSortBy,
+sortOrder,
+setSortOrder,
+
+// Data
+searchData: searchQuery.data,
+isLoading: searchQuery.isLoading,
+suggestions: autocompleteQuery.data || [],
+facets: facetsQuery.data,
+
+// Methods
+refetch: searchQuery.refetch,

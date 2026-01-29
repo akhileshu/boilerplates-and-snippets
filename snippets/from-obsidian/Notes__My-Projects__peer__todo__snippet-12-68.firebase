@@ -1,0 +1,55 @@
+
+{
+  "rules": {
+    "chats": {
+      "$chatId": {
+        ".read": true,
+        ".write": true,
+
+        "participants": {
+          "$uid": { ".validate": "newData.isBoolean()" }
+        },
+        "bookId": { ".validate": "newData.isString()" },
+        "createdAt": { ".validate": "newData.isNumber()" },
+        "lastMessage": {
+          ".validate": "newData.isString() || newData.val() == null"
+        },
+        "lastMessageAt": {
+          ".validate": "newData.isNumber() || newData.val() == null"
+        }
+      }
+    },
+
+    "messages": {
+      "$chatId": {
+        ".read": true,
+        ".write": true,
+
+        "$msgId": {
+          ".validate": "newData.hasChildren(['senderId','createdAt'])",
+
+          "senderId": { ".validate": "newData.isString()" },
+          "text": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 2000 || newData.val() == null"
+          },
+          "createdAt": { ".validate": "newData.isNumber()" },
+          "type": {
+            ".validate": "newData.isString() || newData.val() == null"
+          }
+        }
+      }
+    },
+
+    "userChats": {
+      "$uid": {
+        ".read": true,
+        ".write": true,
+
+        "$chatId": {
+          ".validate": "newData.hasChildren(['lastRead','unreadCount','role'])",
+
+          "lastRead": {
+            ".validate": "newData.isNumber() || newData.val() == null"
+
+> 🔗 Extracted to GitHub
+> https://github.com/akhileshu/boilerplates-and-snippets/blob/main/snippets/from-obsidian/Notes__My-Projects__peer__todo__snippet-65-173.txt

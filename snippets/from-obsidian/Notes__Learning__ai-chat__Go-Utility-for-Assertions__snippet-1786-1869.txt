@@ -1,0 +1,15 @@
+respBody, _ := io.ReadAll(resp.Body)
+
+// assertions: upstream side
+assert.Equal(t, gotMethod, http.MethodPost)
+assert.Equal(t, gotPath, "/hello")
+assert.Equal(t, gotQuery, "x=1")
+assert.Equal(t, gotBody, "ping")
+
+// assertions: client side
+assert.EqualMsg(
+	t,
+	"response body",
+	string(respBody),
+	"upstream-response",
+)

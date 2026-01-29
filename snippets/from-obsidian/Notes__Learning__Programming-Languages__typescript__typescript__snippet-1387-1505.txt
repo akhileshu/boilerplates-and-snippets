@@ -1,0 +1,118 @@
+- `tupple`: fixed length array with fixed element type
+- can use `[ ]notation` not .notation on types
+
+- [https://www.totaltypescript.com/event-types-in-react-and-typescript#solution-4-use-an-eventfrom-helper](https://www.totaltypescript.com/event-types-in-react-and-typescript#solution-4-use-an-eventfrom-helper)
+    
+    ```TypeScript
+    const onChange = (e: EventFor<"input", "onChange">) => {
+      console.log(e);
+    };
+    
+    <input onChange={onChange} />;
+    ```
+    
+    ```TypeScript
+    type GetEventHandlers<
+      T extends keyof JSX.IntrinsicElements
+    > = Extract<keyof JSX.IntrinsicElements[T], `on${string}`>;
+    
+    /**
+     * Provides the event type for a given element and handler.
+     *
+     * @example
+     *
+     * type MyEvent = EventFor<"input", "onChange">;
+     */
+    export type EventFor<
+      TElement extends keyof JSX.IntrinsicElements,
+      THandler extends GetEventHandlers<TElement>
+    > = JSX.IntrinsicElements[TElement][THandler] extends
+      | ((e: infer TEvent) => any)
+      | undefined
+      ? TEvent
+      : never;
+    ```
+    
+- **Pass a Component as a Prop in React**
+    
+    pass jsx as prop : `React.ReactNode`
+    
+    ```TypeScript
+    import React from 'react'
+    
+    const Row = (props: {
+      icon: React.ComponentType<{
+        className: string;
+      }>;
+    }) => {
+      return (
+        <div>
+          <props.icon className="h-8 w-8" />
+          {/* <props.icon/> error:prop className missing */}
+        </div>
+      );
+    };
+    
+    function renderRow(){
+        return <Row icon={UserIcon}  />
+    }
+    function UserIcon(){
+        return <div>icon</div>
+    }
+    ```
+    
+- generic & type argument
+    - generic - adj: a type, function, or class that declares one or more type parameters.
+    - < in here > its 'type argument' : let nameAttribute: Property<string> = { attribute: 'apple' };
+- vs code snippet for **Strongly Typing React Props**
+    
+    ```TypeScript
+    //vs code snippet
+    {
+      "component": {
+        "prefix": "comp",
+        "body": [
+          "export interface $1Props {",
+          "  $2",
+          "}",
+          "",
+          "export const $1 = (props: $1Props) => {",
+          "  return $3",
+          "}"
+        ]
+      }
+    }
+    ```
+    
+      
+    
+- [Array<T> or T[ ]](https://www.totaltypescript.com/array-types-in-typescript)
+    
+    mostly identical
+    
+    • Using `**keyof**` with `**T[]**` can lead to unexpected results.
+    
+- **satisfies` Operator**
+    
+    if you declare a wider type than you want, you're stuck with the wider type.
+    
+    **When you use** `**satisfies**`**, the value BEATS the type.**
+    
+    This means it infers the narrowest possible type, not the wider type you specify
+    
+    ```TypeScript
+    const routes = {
+      "/": {},
+      "/users": {},
+      "/admin/users": {},
+    } satisfies Record<string, {}>;
+    
+    // Property 'awdkjanwdkjn' does not exist on type
+    // '{ "/": {}; "/users": {}; "/admin/users": {}; }'
+    routes.awdkjanwdkjn;
+    ```
+    
+      
+    
+
+  

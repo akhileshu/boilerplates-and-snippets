@@ -1,0 +1,21 @@
+
+* * *
+
+## 🔧 Update `saveChat()` accordingly
+
+```ts
+async function saveChat() {
+  const markdown = extractChatMarkdown();
+
+  try {
+    await fetch('http://localhost:3333/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ markdown }),
+    });
+
+    alert('✅ Chat saved as Markdown');
+  } catch {
+    alert('❌ Backend not running');
+  }
+}

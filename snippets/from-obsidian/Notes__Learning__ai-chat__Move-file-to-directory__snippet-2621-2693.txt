@@ -1,0 +1,3 @@
+echo "⚠️ Killing Ollama"
+sudo pkill -9 -f ollama
+;;

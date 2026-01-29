@@ -1,0 +1,285 @@
+// apps/api/src/router/search.ts
+import { z } from 'zod'
+import { prisma } from '@ecommerce/db'
+import { searchService } from '@ecommerce/search'
+import { router, publicProcedure, protectedProcedure } from '../trpc'
+
+export const searchRouter = router({
+  search: publicProcedure
+    .input(z.object({
+      query: z.string().min(1).max(100),
+      filters: z.object({
+        category: z.string().optional(),
+        brand: z.string().optional(),
+        minPrice: z.number().optional(),
+        maxPrice: z.number().optional(),
+        inStock: z.boolean().optional(),
+      }).optional(),
+      options: z.object({
+        sort: z.string().optional(),
+        order: z.enum(['asc', 'desc']).optional(),
+        limit: z.number().min(1).max(100).optional(),
+        page: z.number().min(1).optional(),
+      }).optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const { query, filters = {}, options = {} } = input
+      
+      // Log search analytics
+      if (ctx.session?.user?.id) {
+        await prisma.searchAnalytics.create({
+          data: {
+            query,
+            results: 0, // Will be updated after search
+            userId: ctx.session.user.id,
+            userAgent: ctx.req?.headers['user-agent'],
+          },
+        })
+      }
+
+      const searchResults = await searchService.searchProducts(
+        query,
+        filters,
+        {
+          ...options,
+          offset: ((options.page || 1) - 1) * (options.limit || 20)
+        }
+      )
+
+      // Update analytics with actual result count
+      if (ctx.session?.user?.id) {
+        await prisma.searchAnalytics.updateMany({
+          where: { query, userId: ctx.session.user.id },
+          data: { results: searchResults.nbHits },
+        })
+      }
+
+      return {
+        products: searchResults.hits,
+        total: searchResults.nbHits,
+        processingTime: searchResults.processingTimeMs,
+        facets: searchResults.facetDistribution,
+      }
+    }),
+
+  getFacets: publicProcedure
+    .query(async () => {
+      const facets = await searchService.getFacets()
+      return facets.facetDistribution
+    }),
+
+  indexProducts: protectedProcedure
+    .mutation(async () => {
+      const products = await prisma.product.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          price: true,
+          category: true,
+          brand: true,
+          tags: true,
+          images: true,
+          inventory: true,
+          isActive: true,
+          createdAt: true,
+        }
+      })
+
+      // Convert Decimal to number for Meilisearch
+      const productsForIndex = products.map(product => ({
+        ...product,
+        price: Number(product.price),
+      }))
+
+      return await searchService.indexProducts(productsForIndex)
+    }),
+
+  getSearchAnalytics: protectedProcedure
+    .input(z.object({
+      startDate: z.string().optional(),
+      endDate: z.string().optional(),
+      limit: z.number().min(1).max(100).default(10),
+    }))
+    .query(async ({ input }) => {
+      const { startDate, endDate, limit } = input
+      
+      const where = {
+        timestamp: {
+          gte: startDate ? new Date(startDate) : undefined,
+          lte: endDate ? new Date(endDate) : undefined,
+        },
+
+> 🔗 Extracted to GitHub
+> https://github.com/akhileshu/boilerplates-and-snippets/blob/main/snippets/from-obsidian/Notes__Learning__easiest-and-fastest-way-of-building-apps__snippet-301-452.txt
+
+      <div className="mb-6">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search products..."
+          className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div className="flex gap-6">
+        {/* Filters Sidebar */}
+        <div className="w-64 flex-shrink-0">
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <h3 className="font-semibold mb-4">Filters</h3>
+            
+            {/* Category Filter */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">Category</label>
+              <select
+                value={filters.category || ''}
+                onChange={(e) => setFilters(prev => ({ 
+                  ...prev, 
+                  category: e.target.value || undefined 
+                }))}
+                className="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="">All Categories</option>
+                {facets?.category && Object.keys(facets.category).map(category => (
+                  <option key={category} value={category}>
+                    {category} ({facets.category[category]})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Brand Filter */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">Brand</label>
+              <select
+                value={filters.brand || ''}
+                onChange={(e) => setFilters(prev => ({ 
+                  ...prev, 
+                  brand: e.target.value || undefined 
+                }))}
+                className="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="">All Brands</option>
+                {facets?.brand && Object.keys(facets.brand).map(brand => (
+                  <option key={brand} value={brand}>
+                    {brand} ({facets.brand[brand]})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Price Range */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">Price Range</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={filters.minPrice || ''}
+                  onChange={(e) => setFilters(prev => ({ 
+                    ...prev, 
+                    minPrice: e.target.value ? Number(e.target.value) : undefined 
+                  }))}
+                  className="w-full p-2 border border-gray-300 rounded"
+                />
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={filters.maxPrice || ''}
+                  onChange={(e) => setFilters(prev => ({ 
+                    ...prev, 
+                    maxPrice: e.target.value ? Number(e.target.value) : undefined 
+                  }))}
+                  className="w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+            </div>
+
+            {/* In Stock Filter */}
+            <div className="mb-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={filters.inStock || false}
+                  onChange={(e) => setFilters(prev => ({ 
+                    ...prev, 
+                    inStock: e.target.checked 
+                  }))}
+                  className="mr-2"
+                />
+                In Stock Only
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="flex-1">
+          {/* Sort Controls */}
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-gray-600">
+              {data ? `Found ${data.total} products in ${data.processingTime}ms` : 'Start typing to search'}
+            </p>
+            <div className="flex gap-4">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="p-2 border border-gray-300 rounded"
+              >
+                <option value="name">Name</option>
+                <option value="price">Price</option>
+                <option value="createdAt">Newest</option>
+              </select>
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
+                className="p-2 border border-gray-300 rounded"
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Results Grid */}
+          {isLoading && (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded p-4 text-red-700">
+              Error searching products: {error.message}
+            </div>
+          )}
+
+          {data && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {data.products.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <img
+                    src={product.images[0]}
+
+> 🔗 Extracted to GitHub
+> https://github.com/akhileshu/boilerplates-and-snippets/blob/main/snippets/from-obsidian/Notes__Learning__easiest-and-fastest-way-of-building-apps__snippet-456-524.txt
+
+        }),
+      ],
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            retry: 1,
+          },
+        },
+      },
+    }
+  },
+  ssr: false,
+})

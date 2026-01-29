@@ -1,0 +1,6 @@
+src/
+├── content/
+│   ├── index.ts        ← THIS is where your code goes
+│   └── index.css
+├── manifest.ts
+└── ...

@@ -1,0 +1,52 @@
+  {/* Price Range */}
+  <div>
+    <h3 className="font-semibold mb-3">Price Range</h3>
+    <div className="space-y-2">
+      <input
+        type="range"
+        min={facets.priceRange.min}
+        max={facets.priceRange.max}
+        value={filters.maxPrice}
+        onChange={(e) => onFiltersChange({
+          ...filters,
+          maxPrice: Number(e.target.value)
+        })}
+        className="w-full"
+      />
+      <div className="flex justify-between text-sm text-gray-600">
+        <span>${filters.minPrice}</span>
+        <span>${filters.maxPrice}</span>
+      </div>
+    </div>
+  </div>
+
+  {/* In Stock Toggle */}
+  <div>
+    <label className="flex items-center">
+      <input
+        type="checkbox"
+        checked={filters.inStock}
+        onChange={(e) => onFiltersChange({
+          ...filters,
+          inStock: e.target.checked
+        })}
+        className="mr-2"
+      />
+      <span>In Stock Only</span>
+    </label>
+  </div>
+
+  {/* Clear Filters */}
+  <button
+    onClick={() => onFiltersChange({
+      category: '',
+      brand: [],
+      minPrice: 0,
+      maxPrice: 1000,
+      inStock: false,
+    })}
+    className="w-full py-2 text-blue-600 border border-blue-600 rounded hover:bg-blue-50"
+  >
+    Clear All Filters
+  </button>
+</div>

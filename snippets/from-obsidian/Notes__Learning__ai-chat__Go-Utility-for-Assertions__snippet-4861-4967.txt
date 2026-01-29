@@ -1,0 +1,4 @@
+t := table.New(
+	table.WithColumns([]table.Column{
+		{Title: "Action", Width: 20},
+		{Title: "Command", Width: 40},

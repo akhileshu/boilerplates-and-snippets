@@ -1,0 +1,1 @@
+<VideoPlayer url="/videos/abcd/index.m3u8" />

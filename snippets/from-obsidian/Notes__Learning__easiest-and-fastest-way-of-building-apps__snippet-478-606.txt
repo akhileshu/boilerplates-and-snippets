@@ -1,0 +1,109 @@
+
+## 🔧 **tRPC Router Setup**
+
+```typescript
+// server/routers/search.ts
+import { z } from 'zod';
+import { router, publicProcedure } from '../trpc';
+import { prisma } from '../prisma';
+
+export const searchRouter = router({
+  // 🔍 Main search with filters, sorting, and pagination
+  products: publicProcedure
+    .input(z.object({
+      query: z.string().optional(),
+      category: z.string().optional(),
+      brand: z.string().array().optional(),
+      minPrice: z.number().optional(),
+      maxPrice: z.number().optional(),
+      inStock: z.boolean().optional(),
+      sortBy: z.enum(['name', 'price', 'rating', 'createdAt']).default('name'),
+      sortOrder: z.enum(['asc', 'desc']).default('asc'),
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(100).default(20),
+
+> 🔗 Extracted to GitHub
+> https://github.com/akhileshu/boilerplates-and-snippets/blob/main/snippets/from-obsidian/Notes__Learning__easiest-and-fastest-way-of-building-apps__snippet-804-858.txt
+
+        currentPage: page,
+      };
+    }),
+
+  // 🔤 Autocomplete suggestions
+  autocomplete: publicProcedure
+    .input(z.object({
+      query: z.string().min(1),
+      limit: z.number().min(1).max(10).default(5)
+    }))
+    .query(async ({ input }) => {
+      const { query, limit } = input;
+
+      // Search in products for suggestions
+      const suggestions = await prisma.product.findMany({
+        where: {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' } },
+            { brand: { contains: query, mode: 'insensitive' } },
+            { category: { contains: query, mode: 'insensitive' } }
+          ]
+        },
+        select: {
+          name: true,
+          brand: true,
+          category: true
+        },
+        take: limit,
+        distinct: ['name']
+      });
+
+      // Transform to unique suggestions
+      const uniqueSuggestions = Array.from(
+        new Set([
+          ...suggestions.map(p => p.name),
+          ...suggestions.map(p => p.brand),
+          ...suggestions.map(p => p.category)
+        ])
+      )
+        .filter(s => s.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, limit);
+
+      return uniqueSuggestions;
+    }),
+
+  // 📊 Get available facets/filters
+  facets: publicProcedure
+    .input(z.object({
+      query: z.string().optional()
+    }))
+    .query(async ({ input }) => {
+      const { query } = input;
+
+      const where = query ? {
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { description: { contains: query, mode: 'insensitive' } }
+        ]
+      } : {};
+
+      const [categories, brands, priceRange] = await Promise.all([
+        // Categories
+        prisma.product.groupBy({
+          by: ['category'],
+          where,
+          _count: { _all: true }
+        }),
+
+        // Brands
+        prisma.product.groupBy({
+          by: ['brand'],
+          where,
+          _count: { _all: true }
+        }),
+
+        // Price range
+        prisma.product.aggregate({
+          where,
+          _min: { price: true },
+          _max: { price: true }
+        })
+      ]);

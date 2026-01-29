@@ -1,0 +1,119 @@
+{
+  "assert.full.file": {
+    "prefix": "assertfile",
+    "body": [
+      "package assert",
+      "",
+      "// Minimal, explicit assertion helpers for Go tests.",
+      "//",
+      "// Design goals:",
+      "// - No reflection",
+      "// - One assertion = one intent",
+      "// - Early exits",
+      "// - Clear failure messages with type info",
+      "",
+      "import (",
+      "\t\"errors\"",
+      "\t\"testing\"",
+      ")",
+      "",
+      "// Equal fails if got != want",
+      "func Equal[T comparable](t *testing.T, got, want T) {",
+      "\tt.Helper()",
+      "",
+      "\tif got == want {",
+      "\t\treturn",
+      "\t}",
+      "",
+      "\tt.Fatalf(\"expected (%T) %v, got (%T) %v\", want, want, got, got)",
+      "}",
+      "",
+      "// NotEqual fails if got == notWant",
+      "func NotEqual[T comparable](t *testing.T, got, notWant T) {",
+      "\tt.Helper()",
+      "",
+      "\tif got != notWant {",
+      "\t\treturn",
+      "\t}",
+      "",
+      "\tt.Fatalf(\"did not expect (%T) %v\", got, got)",
+      "}",
+      "",
+      "// SliceEqual checks length and order",
+      "func SliceEqual[T comparable](t *testing.T, got, want []T) {",
+      "\tt.Helper()",
+      "",
+      "\tif len(got) != len(want) {",
+      "\t\tt.Fatalf(\"length mismatch (%T): %d vs %d\", got, len(got), len(want))",
+      "\t}",
+      "",
+      "\tfor i := range got {",
+      "\t\tif got[i] != want[i] {",
+      "\t\t\tt.Fatalf(\"index %d (%T): %v != %v\", i, got[i], got[i], want[i])",
+      "\t\t}",
+      "\t}",
+
+> 🔗 Extracted to GitHub
+> https://github.com/akhileshu/boilerplates-and-snippets/blob/main/snippets/from-obsidian/Notes__Learning__ai-chat__Go-Utility-for-Assertions__snippet-705-810.txt
+
+* * *
+
+**You:**
+
+func TestFunctionName(t *testing.T) {
+	assert.Equal(t, got, want)
+	assert.NotEqual(t, got, notWant)
+	assert.Nil(t, ptr)
+	assert.NotNil(t, ptr)
+	assert.SliceEqual(t, got, want)
+	assert.ErrorIs(t, err, targetErr)
+	assert.NoError(t, err)
+}
+
+complete this test so we know all our assets are right
+
+* * *
+
+**ChatGPT:**
+
+Perfect.  
+Here is a **complete, minimal, self-verifying test** that exercises **every assert** and **passes**.
+
+No mocks. No tricks. Just proof that asserts work.
+
+```go
+func TestAssertUtilities(t *testing.T) {
+	// Equal / NotEqual
+	got := 10
+	want := 10
+	notWant := 20
+
+	assert.Equal(t, got, want)
+	assert.NotEqual(t, got, notWant)
+
+	// Nil / NotNil
+	type User struct {
+		ID int
+	}
+
+	var nilUser *User
+	user := &User{ID: 1}
+
+	assert.Nil(t, nilUser)
+	assert.NotNil(t, user)
+
+	// SliceEqual
+	gotSlice := []int{1, 2, 3}
+	wantSlice := []int{1, 2, 3}
+
+	assert.SliceEqual(t, gotSlice, wantSlice)
+
+	// ErrorIs / NoError
+	var targetErr = errors.New("target error")
+
+	wrappedErr := fmt.Errorf("wrapped: %w", targetErr)
+	noErr := error(nil)
+
+	assert.ErrorIs(t, wrappedErr, targetErr)
+	assert.NoError(t, noErr)
+}

@@ -1,0 +1,58 @@
+    ```JavaScript
+    import { ApolloServer, gql } from 'apollo-server-micro';
+    import { PrismaClient } from '@prisma/client';
+    
+    const prisma = new PrismaClient();
+    
+    // GraphQL Schema
+    const typeDefs = gql`
+      type User {
+        id: ID!
+        name: String!
+        email: String!
+      }
+    
+      type Query {
+        users: [User]
+      }
+    
+      type Mutation {
+        createUser(name: String!, email: String!): User
+      }
+    `;
+    
+    // Resolvers for GraphQL operations
+    const resolvers = {
+      Query: {
+        users: async () => await prisma.user.findMany(),
+      },
+      Mutation: {
+        createUser: async (_, { name, email }) => {
+          return await prisma.user.create({
+            data: { name, email },
+          });
+        },
+      },
+    };
+    
+    // Create ApolloServer instance
+    const apolloServer = new ApolloServer({
+      typeDefs,
+      resolvers,
+    });
+    
+    const startServer = apolloServer.start();
+    
+    export default async function handler(req, res) {
+      await startServer;
+      await apolloServer.createHandler({
+        path: '/api/graphql',
+      })(req, res);
+    }
+    
+    export const config = {
+      api: {
+        bodyParser: false,
+      },
+    };
+    ```

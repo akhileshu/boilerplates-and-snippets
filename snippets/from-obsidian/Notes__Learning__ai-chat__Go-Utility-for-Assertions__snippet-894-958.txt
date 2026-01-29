@@ -1,0 +1,5 @@
+if got == want {
+	return
+}
+
+t.Fatalf("expected (%T) %v, got (%T) %v", want, want, got, got)

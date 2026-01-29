@@ -1,0 +1,56 @@
+    
+* `ai ask --diff file.go` → unified diff
+    
+* `ai ask --review file.go`
+    
+* timestamped sections
+    
+* auto-clear file per session
+    
+* `ai chat` append mode vs `ai ask` overwrite
+    
+
+But honestly — what you have now is **solid engineering**, not a toy.
+
+If you want, next I can:
+
+* add multi-question sessions
+    
+* add `--reset`
+    
+* add auto-title from prompt
+    
+* add file-based context
+    
+
+Just tell me what to push next 🚀
+
+* * *
+
+**You:**
+
+how can i make this to edit my files / take context from 
+
+* * *
+
+**ChatGPT:**
+
+Perfect question.  
+This is where your setup stops being “Q&A” and becomes **Claude-Code–style file editing** — safely, locally, and fast.
+
+I’ll give you a **clean, minimal design** that matches:
+
+* your hardware
+    
+* your taste for control
+    
+* your dislike for magic/agents
+    
+
+* * *
+
+## 🧠 Mental model (important)
+
+You want **three distinct capabilities**:
+
+1. **Read context** (one file / selected files)

@@ -1,3 +1,8 @@
+## boilerplates
+- `node-cli-devmate`
+- /home/akhilesh/software-projects/code/devmate
+- `../code ❯ cp -r devmate/* "boilerplates and snippets/node-cli-devmate/"`
+
 ## 📁 Environment File Setup
 
 This repo uses multiple `.env` files to separate configuration from secrets. Follow the conventions below to ensure security and clarity.

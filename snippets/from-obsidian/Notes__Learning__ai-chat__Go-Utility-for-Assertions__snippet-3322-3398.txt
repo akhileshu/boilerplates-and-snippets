@@ -1,0 +1,6 @@
+* spacing
+    
+* newlines
+    
+* formatting
+    

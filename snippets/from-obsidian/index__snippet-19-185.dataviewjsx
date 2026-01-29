@@ -1,0 +1,164 @@
+/**********************************************************************
+v 1.0
+
+ 🧭 Learning Dashboard (No Reload)
+ 🔹 Toggle any column live — no refresh
+ 🔹 Persists column visibility via localStorage
+ **********************************************************************/
+
+const ROOT = "Notes/Learning";
+const STORAGE_KEY = "learningDashboardColumns";
+
+// --- Column configuration ---
+const columns = [
+  { key: "folder", label: "📂 Folder" },
+  { key: "tags", label: "🏷️ Tags" },
+  { key: "summary", label: "🧠 Summary" },
+  { key: "stats", label: "📈 Stats" },
+  { key: "notes", label: "📄 Notes" },
+];
+
+// --- Load saved column visibility ---
+let savedConfig = {};
+try {
+  savedConfig = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+} catch {
+  savedConfig = {};
+}
+columns.forEach(c => {
+  if (savedConfig[c.key] === undefined) savedConfig[c.key] = true;
+});
+
+// --- Get folders ---
+const folderPages = dv.pages(`"${ROOT}"`).where(p => p.file.name === "index");
+const rootEntry = {
+  file: { path: ROOT, folder: ROOT, name: "Learning (Root)" },
+  description: "Notes directly under the main Learning folder",
+  tags: [],
+};
+const folders = [rootEntry, ...folderPages];
+
+// --- Recursive helper for rendering subfolders ---
+function renderNotes(folderPath, depth = 0) {
+  const indent = "&nbsp;".repeat(depth * 4);
+  const files = dv.pages(`"${folderPath}"`)
+    .where(p => p.file.name !== "index" && p.file.folder === folderPath)
+    .sort(p => p.file.name);
+
+  const subfolders = Array.from(
+    new Set(
+      dv.pages(`"${folderPath}"`)
+        .map(p => p.file.folder)
+        .filter(f => f.startsWith(folderPath + "/") && f !== folderPath)
+        .map(f => folderPath + "/" + f.replace(folderPath + "/", "").split("/")[0])
+    )
+  ).sort();
+
+  let result = "";
+  for (const note of files)
+    result += `${indent}• [[${note.file.path}|${note.file.name}]]<br>`;
+  for (const sub of subfolders) {
+    const subName = sub.split("/").pop();
+    const count = dv
+      .pages(`"${sub}"`)
+      .where(p => p.file.name !== "index" && p.file.folder === sub).length;
+    result += `${indent}<span class="folder-label">📂 ${subName} (${count})</span><br>`;
+    result += renderNotes(sub, depth + 1);
+  }
+  return result || `${indent}—<br>`;
+}
+
+// --- Build table ---
+const headers = columns.map(c => c.label);
+dv.table(
+  headers,
+  folders.map(folderPage => {
+    const folderPath = folderPage.file.folder;
+    const isRoot = folderPath === ROOT;
+
+    const clickableTags = folderPage.tags?.length
+      ? folderPage.tags.map(t => `<span class="tag-item">#${t}</span><br>`).join(" ")
+      : "—";
+
+    const linkedNotes = isRoot
+      ? dv.pages(`"${ROOT}"`)
+          .where(p => p.file.name !== "index" && p.file.folder === ROOT)
+          .sort(p => p.file.name)
+          .map(note => `• [[${note.file.path}|${note.file.name}]]<br>`)
+          .join("")
+      : renderNotes(folderPath);
+
+    const count = dv.pages(`"${folderPath}"`)
+      .where(p => p.file.name !== "index" && p.file.folder === folderPath).length;
+
+    const folderName = isRoot
+      ? "Learning (Root)"
+      : `[[${folderPath}/index|${folderPath.split("/").pop()}]]`;
+
+    const row = {
+      folder: folderName,
+      tags: clickableTags,
+      summary: folderPage.description ?? "—",
+      stats: count > 0 ? `${count} notes` : "—",
+      notes: linkedNotes || "—",
+    };
+
+    return columns.map(c => row[c.key]);
+  })
+);
+
+// --- Toolbar creation ---
+const table = this.container.querySelector("table");
+const toolbar = document.createElement("div");
+toolbar.style.marginBottom = "0.75em";
+toolbar.innerHTML = `
+  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:1em;">
+    ${columns
+      .map(
+        (c, i) => `
+        <label style="display:flex;align-items:center;gap:0.3em;">
+          <input type="checkbox" data-col="${i}" data-key="${c.key}" ${
+          savedConfig[c.key] ? "checked" : ""
+        }>
+          <span>${c.label}</span>
+        </label>`
+      )
+      .join("")}
+    <button id="resetColumns" style="margin-left:1em;padding:2px 6px;border:none;border-radius:4px;background:var(--interactive-accent);color:white;cursor:pointer;">⟳ Reset</button>
+  </div>
+`;
+this.container.prepend(toolbar);
+
+// --- Hide columns based on saved config ---
+function applyVisibility() {
+  table.querySelectorAll("tr").forEach(row => {
+    row.querySelectorAll("th, td").forEach((cell, i) => {
+      const colKey = columns[i]?.key;
+      if (colKey) cell.style.display = savedConfig[colKey] ? "" : "none";
+    });
+  });
+}
+applyVisibility();
+
+// --- Toggle columns live ---
+toolbar.querySelectorAll('input[type="checkbox"]').forEach(input => {
+  input.addEventListener("change", e => {
+    const key = e.target.dataset.key;
+    const colIndex = parseInt(e.target.dataset.col);
+    const visible = e.target.checked;
+    savedConfig[key] = visible;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedConfig));
+    table.querySelectorAll("tr").forEach(row => {
+      const cell = row.children[colIndex];
+      if (cell) cell.style.display = visible ? "" : "none";
+    });
+  });
+});
+
+// --- Reset button ---
+toolbar.querySelector("#resetColumns").addEventListener("click", () => {
+  columns.forEach(c => (savedConfig[c.key] = true));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(savedConfig));
+  applyVisibility();
+  toolbar.querySelectorAll('input[type="checkbox"]').forEach(cb => (cb.checked = true));
+});

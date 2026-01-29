@@ -1,0 +1,35 @@
+{
+  "name": "devmate",
+  "version": "0.1.0",
+  "bin": {
+    "devmate": "bin/devmate.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/main/index.ts",
+    "setup": "npm install && npm run build && npm link"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "cli-table3": "^0.6.5",
+    "commander": "^14.0.2",
+    "execa": "^9.6.1",
+    "fs-extra": "^11.3.3",
+    "ora": "^9.1.0",
+    "prompts": "^2.4.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.0.10",
+    "@types/prompts": "^2.4.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "description": "- simplest setup is `npm run setup` - ❯ which devmate /home/akhilesh/.nvm/versions/node/v22.14.0/bin/devmate",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
